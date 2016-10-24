@@ -11,6 +11,10 @@ from . import forms
 TOWNS = dvbboxes.TOWNS
 TOWNS.sort()
 
+CHANNELS = ()
+for service_id, name in dvbboxes.CHANNELS:
+    CHANNELS += ((service_id, name), )
+
 
 def handle_uploaded_file(f):
     path = os.path.join('', f.name)
@@ -294,7 +298,7 @@ def program(request, **kwargs):
     """view for gettings programs"""
     context = {
         'view': 'program',
-        'all_channels': dvbboxes._channels(),
+        'all_channels': CHANNELS,
         'all_towns': TOWNS,
         'method': request.method,
         'actions': ['program', 'showresult'],
