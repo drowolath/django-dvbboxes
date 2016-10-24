@@ -12,7 +12,7 @@ TOWNS = dvbboxes.TOWNS
 TOWNS.sort()
 
 CHANNELS = ()
-for service_id, name in dvbboxes.CHANNELS:
+for service_id, name in dvbboxes.CHANNELS.items():
     CHANNELS += ((service_id, name), )
 
 
