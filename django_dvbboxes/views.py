@@ -177,51 +177,23 @@ def media(request, **kwargs):
                         )
                 return redirect('media', filename=expression)
     elif 'media/search' in request.path:
-        context['action'] = 'search'
+        context['action'] = 'media_search'
         if request.method == 'GET':
             return redirect('index')
         elif request.method == 'POST':
-            form = forms.StandardForm(request.POST)
+            form = forms.SearchMediaForm(request.POST)
             if form.is_valid():
                 expression = form.cleaned_data['expression']
                 expression = expression.lower().replace(' ', '_')
                 towns = request.POST.getlist('towns')
                 towns.sort()
-                if towns == TOWNS or not towns:
-                    towns = None
-                context['towns'] = towns
-                answer = {}
-                # this will result into a hashmap
-                # giving the repartition in the cluster
-                # of all found filenames
                 if not towns:
-                    result = dvbboxes._media(
-                        expression,
-                        town=None,
-                        search=True
-                        )
-                    for data in result:
-                        town = data['town']
-                        for i in data['filenames']:
-                            if i not in answer:
-                                answer[i] = [town]
-                            else:
-                                answer[i].append(town)
-                else:
-                    for town in towns:
-                        result = dvbboxes._media(
-                            expression,
-                            town=town,
-                            search=True
-                            )
-                        for data in result:
-                            town = data['town']
-                            for i in data['filenames']:
-                                if i not in answer:
-                                    answer[i] = [town]
-                                else:
-                                    answer[i].append(town)
-                context['answer'] = answer
+                    towns = TOWNS
+                context['towns'] = towns
+                answer = dvbboxes.Media.search(expression, towns)
+                context['answer'] = sorted(
+                    [i.rstrip('.ts') for i in answer]
+                    )
                 return render(request, 'dvbboxes.html', context)
     else:
         context['action'] = 'display'

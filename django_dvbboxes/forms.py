@@ -6,6 +6,12 @@ for town in dvbboxes.TOWNS:
     TOWNS += ((town, town), )
 
 
+class SearchMediaForm(forms.Form):
+    """search for media name in towns"""
+    expression = forms.CharField(max_length=100, required=True)
+    town = forms.MultipleChoiceField(choices=TOWNS, required=False)
+
+
 class StandardForm(forms.Form):
     """given text, apply proper action throughout cluster"""
     expression = forms.CharField(max_length=100, required=True)

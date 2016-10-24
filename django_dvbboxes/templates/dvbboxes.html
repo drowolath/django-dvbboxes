@@ -278,7 +278,7 @@ Rechercher un fichier
     </div>
   </div>
 </div>
-{% elif action == "search" %}
+{% elif action == "media_search" %}
 <div class="modal fade" id="resultModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -293,22 +293,13 @@ Rechercher un fichier
 	{% if answer %}
 	  <input class="search" placeholder="Filtrer" />
 	  <ul class="list">
-	    {% for filename, towns in answer.items %}
-	      {% if towns|length == 1 %}
-	        <li>
-                  <a class="moviename"
-                     href="{% url 'django_dvbboxes:media_infos' filename=filename town=towns.0 %}">
-                     {{ filename }}
-                  </a>: {{ towns.0 }}
-                </li>
-              {% else %}
- 	        <li>
-                  <a class="moviename"
-                     href="{% url 'django_dvbboxes:media_infos_' filename=filename %}">
-                     {{ filename }}
-                  </a>: {{ towns|join:", " }}
-                </li>
-              {% endif %}
+	    {% for filename in answer %}
+ 	      <li>
+                <a class="moviename"
+                   href="{% url 'django_dvbboxes:media_infos_' filename=filename %}">
+		  {{ filename }}
+                </a>
+              </li>
 	    {% endfor %}
 	  </ul>
         {% else %}
