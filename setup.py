@@ -8,14 +8,14 @@ with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
-    name='django-nemo',
+    name='django-dvbboxes',
     version='0.2',
     packages=find_packages(),
     include_package_data=True,
     license='Apache 2.0',
-    description='A simple Django app interfacing nemo',
+    description='A simple Django app interfacing dvbboxes',
     long_description=README,
-    url='http:/gitlab.blueline.mg/default/django-nemo.git',
+    url='http:/gitlab.blueline.mg/default/django-dvbboxes.git',
     author='Thomas Ayih-Akakpo',
     author_email='thomas.ayih-akakpo@gulfsat.mg',
     classifiers=[
