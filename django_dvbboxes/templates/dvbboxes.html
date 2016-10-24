@@ -129,12 +129,12 @@ Rechercher un fichier
 		 </button>
 		 <ul class="dropdown-menu" aria-labelledby="dropdownService">
 		   <li>
-		   {% for service_id, names in all_channels.items %}
-		     <a href="#" data-value="{{ service_id }}">
-		       <input type="radio" name="service_id" value="{{ service_id }}" />
-		       &nbsp;{{ names|join:", " }}
-		     </a>
-		   {% endfor %}
+		     {% for service_id, name in all_channels.items %}
+		       <a href="#" data-value="{{ service_id }}">
+		         <input type="radio" name="service_id" value="{{ service_id }}" />
+		         &nbsp;{{ name }}
+		       </a>
+		     {% endfor %}
 	           </li>
 	         </ul>
 	       </span>

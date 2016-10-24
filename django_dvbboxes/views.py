@@ -11,9 +11,7 @@ from . import forms
 TOWNS = dvbboxes.TOWNS
 TOWNS.sort()
 
-CHANNELS = ()
-for service_id, name in dvbboxes.CHANNELS.items():
-    CHANNELS += ((service_id, name), )
+CHANNELS = dvbboxes.CHANNELS
 
 
 def handle_uploaded_file(f):
@@ -29,7 +27,8 @@ def index(request):
     """displays home page of the app"""
     context = {
         'view': 'index',
-        'all_towns': TOWNS
+        'all_channels': CHANNELS,
+        'all_towns': TOWNS,
         }
     return render(request, 'dvbboxes.html', context)
 
