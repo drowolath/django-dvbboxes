@@ -737,7 +737,7 @@ return false;
   $('#resultModal').on('hidden.bs.modal', function (e) {
     window.location.href = "{% url 'django_dvbboxes:index' %}";
   });
-  {% if action == "search" %}
+  {% if action == "media_search" %}
   var options = {
     valueNames: ['moviename']
   };
