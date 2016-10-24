@@ -11,7 +11,7 @@ Rechercher un fichier
 {% block data %}
 <!-- provides a form that allows search of files -->
 <form class="col-lg-12" role="form" method="POST"
-      action="{% url 'django_nemo:media_search' %}">{% csrf_token %}
+      action="{% url 'django_dvbboxes:media_search' %}">{% csrf_token %}
   <div class="input-group" style="width:340px;margin:0 auto;">
     <span class="input-group-btn"> 
       <button type="button" class="btn btn-small dropdown-toggle" data-toggle="dropdown">
@@ -40,15 +40,15 @@ Rechercher un fichier
 {% block menu %}
 <div class="row">
   <div class="col-lg-12 text-center v-center" style="font-size:39pt;">
-    <a href="{% url 'django_nemo:program' %}">
+    <a href="{% url 'django_dvbboxes:program' %}">
       <i class="fa fa-tv"
 	 title="Guide des programmes"></i>
     </a>
-    <a href="{% url 'django_nemo:listing' %}">
+    <a href="{% url 'django_dvbboxes:listing' %}">
       <i class="fa fa-file-text"
 	 title="Charger un listing"></i>
     </a>
-    <a href="{% url 'django_nemo:media_delete_batch' %}">
+    <a href="{% url 'django_dvbboxes:media_delete_batch' %}">
       <i class="fa fa-trash"
 	 title="Supprimer des fichiers"></i>
     </a>
@@ -115,14 +115,14 @@ Rechercher un fichier
 	      {% if towns|length == 1 %}
 	        <li>
                   <a class="moviename"
-                     href="{% url 'django_nemo:media_infos' filename=filename town=towns.0 %}">
+                     href="{% url 'django_dvbboxes:media_infos' filename=filename town=towns.0 %}">
                      {{ filename }}
                   </a>: {{ towns.0 }}
                 </li>
               {% else %}
  	        <li>
                   <a class="moviename"
-                     href="{% url 'django_nemo:media_infos_' filename=filename %}">
+                     href="{% url 'django_dvbboxes:media_infos_' filename=filename %}">
                      {{ filename }}
                   </a>: {{ towns|join:", " }}
                 </li>
@@ -151,10 +151,10 @@ Rechercher un fichier
 	</button>
 	<h4 class="modal-title"
 	    id="myModalLabel">{{ filename }}</h4>
-	<a href="{% url 'django_nemo:media_rename_' filename=filename %}">
+	<a href="{% url 'django_dvbboxes:media_rename_' filename=filename %}">
 	  Renommer
 	</a>|
-	<a href="{% url 'django_nemo:media_delete_' filename=filename %}">
+	<a href="{% url 'django_dvbboxes:media_delete_' filename=filename %}">
 	  Supprimer
 	</a>
 	<br>
@@ -203,9 +203,9 @@ Rechercher un fichier
 	      role="form"
 	      method="POST"
 	      {% if not town %}
-	        action="{% url 'django_nemo:media_rename_' filename=filename %}"
+	        action="{% url 'django_dvbboxes:media_rename_' filename=filename %}"
 	      {% else %}
-	        action="{% url 'django_nemo:media_rename' filename=filename town=town %}"
+	        action="{% url 'django_dvbboxes:media_rename' filename=filename town=town %}"
               {% endif %}
 	      >{% csrf_token %}
 	  <div class="input-group" style="width:340px;margin:0 auto;">
@@ -264,11 +264,11 @@ Rechercher un fichier
 	        role="form"
 	        method="POST"
 		{% if filename and town %}
-		  action="{% url 'django_nemo:media_delete' filename=filename town=town %}"
+		  action="{% url 'django_dvbboxes:media_delete' filename=filename town=town %}"
 	        {% elif filename %}
-	          action="{% url 'django_nemo:media_delete_' filename=filename %}"
+	          action="{% url 'django_dvbboxes:media_delete_' filename=filename %}"
 	        {% else %}
-	          action="{% url 'django_nemo:media_delete_batch' %}"
+	          action="{% url 'django_dvbboxes:media_delete_batch' %}"
                 {% endif %}
 		{% if upload %}
                   enctype="multipart/form-data"
@@ -441,7 +441,7 @@ Rechercher un fichier
 	  <form class="col-lg-12"
 	        role="form"
 	        method="POST"
-	        action="{% url 'django_nemo:listing' %}"
+	        action="{% url 'django_dvbboxes:listing' %}"
                 enctype="multipart/form-data">{% csrf_token %}
 	    <div class="input-group" style="width:340px;margin:0 auto;">
 	      <label class="btn" for="my-file-selector">
@@ -562,7 +562,7 @@ return false;
 <script type="text/javascript">
   $('#resultModal').modal('show');
   $('#resultModal').on('hidden.bs.modal', function (e) {
-    window.location.href = "{% url 'django_nemo:index' %}";
+    window.location.href = "{% url 'django_dvbboxes:index' %}";
   });
   {% if action == "search" %}
   var options = {
