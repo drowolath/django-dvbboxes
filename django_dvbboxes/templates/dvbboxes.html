@@ -1,0 +1,582 @@
+{% extends "base.html" %}
+
+{% block title %}
+Gestion du cluster dvbbox
+{% endblock %}
+
+{% block subtitle %}
+Rechercher un fichier
+{% endblock %}
+
+{% block data %}
+<!-- provides a form that allows search of files -->
+<form class="col-lg-12" role="form" method="POST"
+      action="{% url 'django_nemo:media_search' %}">{% csrf_token %}
+  <div class="input-group" style="width:340px;margin:0 auto;">
+    <span class="input-group-btn"> 
+      <button type="button" class="btn btn-small dropdown-toggle" data-toggle="dropdown">
+        <span class="glyphicon glyphicon-tasks"></span> <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu">
+        {% for town in all_towns %}
+          <li>
+	    <a href="#" data-value="{{ town }}">
+	    <input type="checkbox" value="{{ town }}" name="towns"/>&nbsp;{{ town|capfirst }}
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    </span>
+    <input type="text" class="form-control" name="expression"
+	   placeholder="Rechercher un fichier...">
+    <span class="input-group-btn"> 
+      <button class="btn btn-small btn-primary" type="submit">Go!</button>
+    </span>
+  </div>
+</form>
+{% endblock %}
+
+
+{% block menu %}
+<div class="row">
+  <div class="col-lg-12 text-center v-center" style="font-size:39pt;">
+    <a href="{% url 'django_nemo:program' %}">
+      <i class="fa fa-tv"
+	 title="Guide des programmes"></i>
+    </a>
+    <a href="{% url 'django_nemo:listing' %}">
+      <i class="fa fa-file-text"
+	 title="Charger un listing"></i>
+    </a>
+    <a href="{% url 'django_nemo:media_delete_batch' %}">
+      <i class="fa fa-trash"
+	 title="Supprimer des fichiers"></i>
+    </a>
+    <a href="{% url 'logout' %}">
+      <i class="fa fa-power-off"
+	 title="Déconnection"></i>
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+{% if not user.username %}
+<div class="modal fade" role="dialog"
+     aria-labelledby="loginLabel"
+     tabindex="-1" id="login">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+	<button type="button" class="close"
+		data-dismiss="modal"
+		aria-label="Close">
+	  <span aria-hidden="true">&times;</span>
+	</button>
+	<h4 class="modal-title" id="loginLabel">Veuillez vous identifier</h4>
+      </div>
+      <div class="modal-body">
+	<div class="container-fluid">
+	  <form class="form-signin" role="form" method="POST"
+		action="/login/?next={{ next }}">{% csrf_token %}
+	    <input type="hidden" name="next" value="{{ next }}">
+	    <input type="text" name="username" class="form-control"
+		   placeholder="Utilisateur">
+	    <br/>
+	    <input type="password" name="password"
+		   class="form-control" placeholder="Mot de passe">
+	    <br/>
+	    <input type="hidden" name="next" value="{{ next }}">
+	    <button class="btn btn-large btn-primary"
+		    type="submit">Go!</button>
+	  </form>
+	</div>
+      </div>
+      <div class="modal-footer"></div>
+    </div>
+  </div>
+</div>
+{% elif action == "search" %}
+<div class="modal fade" id="resultModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+	<button type="button" class="close"
+		data-dismiss="modal" aria-label="Close">
+	  <span aria-hidden="true">&times;</span>
+	</button>
+	<h4 class="modal-title" id="myModalLabel">R&eacute;sultats</h4>
+      </div>
+      <div class="modal-body" id="tsfiles">
+	{% if answer %}
+	  <input class="search" placeholder="Filtrer" />
+	  <ul class="list">
+	    {% for filename, towns in answer.items %}
+	      {% if towns|length == 1 %}
+	        <li>
+                  <a class="moviename"
+                     href="{% url 'django_nemo:media_infos' filename=filename town=towns.0 %}">
+                     {{ filename }}
+                  </a>: {{ towns.0 }}
+                </li>
+              {% else %}
+ 	        <li>
+                  <a class="moviename"
+                     href="{% url 'django_nemo:media_infos_' filename=filename %}">
+                     {{ filename }}
+                  </a>: {{ towns|join:", " }}
+                </li>
+              {% endif %}
+	    {% endfor %}
+	  </ul>
+        {% else %}
+          Aucun résultat n'a été trouvé.
+        {% endif %}
+      </div>
+      <div class="modal-footer">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">Retour</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% elif action == "display" %}
+<div class="modal fade" id="resultModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+	<button type="button" class="close"
+		data-dismiss="modal" aria-label="Close">
+	  <span aria-hidden="true">&times;</span>
+	</button>
+	<h4 class="modal-title"
+	    id="myModalLabel">{{ filename }}</h4>
+	<a href="{% url 'django_nemo:media_rename_' filename=filename %}">
+	  Renommer
+	</a>|
+	<a href="{% url 'django_nemo:media_delete_' filename=filename %}">
+	  Supprimer
+	</a>
+	<br>
+	{% if not town %}
+	Villes: {{ answer.towns|join:", " }}
+	{% else %}
+	Ville: {{ town }}
+	{% endif %}
+	<br>
+	Durée: {{ answer.duration }}<br>
+	{% if answer.schedule %}
+	  <h5>Ci-dessous, la programmation par chaine: </h5><br>
+	    <ul>
+	      {% for service_id, timestamps in answer.schedule.items %}
+	        <li>{{ service_id }}:
+		  <ul>
+		    {% for timestamp in timestamps %}
+		      <li>{{ timestamp }}</li>
+		    {% endfor %}
+		  </ul>
+	        </li>
+	      {% endfor %}
+	    </ul>
+	{% endif %}
+      </div>
+      <div class="modal-footer">
+	<button type="button"
+		class="btn btn-default" data-dismiss="modal">Retour</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% elif action == "rename" %}
+<div class="modal fade" id="resultModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+	<button type="button" class="close"
+		data-dismiss="modal" aria-label="Close">
+	  <span aria-hidden="true">&times;</span>
+	</button>
+	<h4 class="modal-title" id="myModalLabel">Renommer {{ filename }}</h4>
+      </div>
+      <div class="modal-body">
+	<form class="col-lg-12"
+	      role="form"
+	      method="POST"
+	      {% if not town %}
+	        action="{% url 'django_nemo:media_rename_' filename=filename %}"
+	      {% else %}
+	        action="{% url 'django_nemo:media_rename' filename=filename town=town %}"
+              {% endif %}
+	      >{% csrf_token %}
+	  <div class="input-group" style="width:340px;margin:0 auto;">
+	    <input type="text" class="form-control input-lg" name="expression"
+		   placeholder="Nouveau nom">
+	    <span class="input-group-btn">
+	      {% if not town %}
+	        <button type="button" class="btn btn-lg dropdown-toggle" data-toggle="dropdown">
+		  <span class="glyphicon glyphicon-tasks"></span> <span class="caret"></span>
+	        </button>
+	        <ul class="dropdown-menu">
+		  {% for town in all_towns %}
+		    <li>
+		      <a href="#" data-value="{{ town }}">
+		        <input type="checkbox" value="{{ town }}" name="towns"/>
+			&nbsp;{{ town|capfirst }}
+		      </a>
+		    </li>
+		  {% endfor %}
+	        </ul>
+              {% endif %} 
+	      <button class="btn btn-lg btn-primary" type="submit">OK</button>
+	    </span>
+	  </div>
+	</form>
+      </div>
+      <div class="modal-footer">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">Retour</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% elif action == "delete" %}
+<div class="modal fade" id="resultModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+	<button type="button" class="close"
+		data-dismiss="modal" aria-label="Close">
+	  <span aria-hidden="true">&times;</span>
+	</button>
+	<h4 class="modal-title" id="myModalLabel">
+	  {% if not filename and not town %}
+            Fournissez une liste de fichiers à supprimer
+          {% elif filename and town %}
+            Supprimer {{ filename }} à {{ town|capfirst }}
+          {% else %}
+            Supprimer {{ filename }}
+          {% endif %}
+        </h4>
+      </div>
+      <div class="modal-body">
+	{% if method == "GET" %}<!--we display forms-->
+	  <form class="col-lg-12"
+	        role="form"
+	        method="POST"
+		{% if filename and town %}
+		  action="{% url 'django_nemo:media_delete' filename=filename town=town %}"
+	        {% elif filename %}
+	          action="{% url 'django_nemo:media_delete_' filename=filename %}"
+	        {% else %}
+	          action="{% url 'django_nemo:media_delete_batch' %}"
+                {% endif %}
+		{% if upload %}
+                  enctype="multipart/form-data"
+                {% endif %}
+	        >{% csrf_token %}
+	    <div class="input-group" style="width:340px;margin:0 auto;">
+	      {% if not filename and not town %}
+	        <span class="input-group-btn">
+	          <button type="button" class="btn btn-small dropdown-toggle"
+			  data-toggle="dropdown">
+		    <span class="glyphicon glyphicon-tasks"></span> <span class="caret"></span>
+	          </button>
+	          <ul class="dropdown-menu">
+		    {% for town in all_towns %}
+		      <li>
+		        <a href="#" data-value="{{ town }}">
+		          <input type="checkbox" value="{{ town }}" name="towns"/>
+			  &nbsp;{{ town|capfirst }}
+		        </a>
+		      </li>
+		    {% endfor %}
+	          </ul>
+		</span>
+		<label class="btn" for="my-file-selector">
+		  <input id="my-file-selector" type="file" style="display:none;"
+			 onchange="$('#upload-file-info').html($(this).val());">
+		  Parcourir...
+		</label>
+		<span class='label label-info' id="upload-file-info"></span>
+		<span class="input-group-btn">
+		  <button class="btn btn-small btn-primary" type="submit">Go!</button>
+		</span>
+	      {% elif filename and town %}
+	        <button class="btn btn-lg btn-danger" type="submit">Supprimer</button>
+              {% else %}	
+	        <button type="button" class="btn btn-lg dropdown-toggle" data-toggle="dropdown">
+		  <span class="glyphicon glyphicon-tasks"></span> <span class="caret"></span>
+	        </button>
+	        <ul class="dropdown-menu">
+		  {% for town in all_towns %}
+		    <li>
+		      <a href="#" data-value="{{ town }}">
+		        <input type="checkbox" value="{{ town }}" name="towns"/>
+		        &nbsp;{{ town|capfirst }}
+		      </a>
+		    </li>
+		  {% endfor %}
+	        </ul>
+		<button class="btn btn-lg btn-danger" type="submit">Supprimer</button>
+	      {% endif %}
+	    </div>
+	  </form>
+	{% elif method == "POST" %}
+          {% for line, data in answer.items %}
+            <h6>{{ line }}<h6>
+            {% for server, response in data.items %}
+	      <p>{{ server }}: {{ response }}</p>
+            {% endfor %}
+          {% endfor %}
+        {% endif %}
+      </div>
+      <div class="modal-footer">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">Retour</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% elif action == "program" %}
+<div class="modal fade" id="resultModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+	<button type="button" class="close"
+		data-dismiss="modal" aria-label="Close">
+	  <span aria-hidden="true">&times;</span>
+	</button>
+	<h4 class="modal-title" id="myModalLabel">Guide des programmes</h4>
+      </div>
+      <div class="modal-body">
+	<form class="col-lg-12"
+	      role="form"
+	      method="POST"
+	      action=".">{% csrf_token %}
+	  <div class="input-group" style="width:340px;margin:0 auto;">
+	      <span class="input-group-btn">
+	        <button type="button" class="btn dropdown-toggle" id="dropdownTown"
+		        data-toggle="dropdown">
+	          <span class="glyphicon glyphicon-tasks"></span> <span class="caret"></span>
+	        </button>
+	        <ul class="dropdown-menu" aria-labelledby="dropdownTown">
+	        {% for town in all_towns %}
+	          <li>
+	            <a href="#" data-value="{{ town }}">
+		      <input type="checkbox" value="{{ town }}" name="towns"/>
+		      &nbsp;{{ town|capfirst }}
+		    </a>
+	          </li>
+	        {% endfor %}
+	        </ul>
+	      </span>
+	      <input type="text" class="form-control" id="datetimepicker1" name="date"/>
+	      <span class="input-group-btn">
+	        <button type="button" class="btn btn-success dropdown-toggle"
+		        data-toggle="dropdown" id="dropdownAction">
+	          <span class="glyphicon glyphicon-cog"></span> <span class="caret"></span>
+	        </button>
+	        <ul class="dropdown-menu" aria-labelledby="dropdownAction">
+	          <li>
+		    <a href="#" data-value="check">
+		      <input type="radio" name="action" value="check" />
+		      &nbsp;Vérifier le programme
+		    </a>
+		    <a href="#" data-value="display">
+		      <input type="radio" name="action" value="display" />
+		      &nbsp;Voir le programme
+		    </a>
+		    <a href="#" data-value="delete">
+		      <input type="radio" name="action" value="delete" />
+		      &nbsp;Supprimer le programme
+		    </a>
+	          </li>
+	        </ul>
+	      </span>
+              <span class="input-group-btn">
+	        <button type="button" class="btn btn-primary dropdown-toggle"
+			data-toggle="dropdown" id="dropdownService">
+		  <span class="glyphicon glyphicon-folder-open"></span> <span class="caret"></span>
+		 </button>
+		 <ul class="dropdown-menu" aria-labelledby="dropdownService">
+		   <li>
+		   {% for service_id, names in all_channels.items %}
+		     <a href="#" data-value="{{ service_id }}">
+		       <input type="radio" name="service_id" value="{{ service_id }}" />
+		       &nbsp;{{ names|join:", " }}
+		     </a>
+		   {% endfor %}
+	           </li>
+	         </ul>
+	       </span>
+	      <button class="btn btn-small btn-primary" type="submit">Go!</button>
+	    </span>
+	  </div>
+	</form>
+      </div>
+      <div class="modal-footer">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">Retour</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% elif action == "parse" %}
+<div class="modal fade" id="resultModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+	<button type="button" class="close"
+		data-dismiss="modal" aria-label="Close">
+	  <span aria-hidden="true">&times;</span>
+	</button>
+	{% if method == "GET" %}
+	  <h4 class="modal-title" id="myModalLabel">Chargez un listing</h4>
+	{% elif method == "POST" %}
+          <h4 class="modal-title" id="myModalLabel">Résultat de l'analyse</h4>
+        {% endif %}
+      </div>
+      <div class="modal-body">
+	{% if method == "GET" %}<!--show form -->
+	  <form class="col-lg-12"
+	        role="form"
+	        method="POST"
+	        action="{% url 'django_nemo:listing' %}"
+                enctype="multipart/form-data">{% csrf_token %}
+	    <div class="input-group" style="width:340px;margin:0 auto;">
+	      <label class="btn" for="my-file-selector">
+	        <input id="my-file-selector" type="file"
+		       style="display:none;" name="file"
+		       onchange="$('#upload-file-info').html($(this).val());"> Parcourir...
+	      </label>
+	      <span class='label label-info' id="upload-file-info"></span>
+	      <span class="input-group-btn">
+	        <button class="btn btn-small btn-primary" type="submit">Go!</button>
+	      </span>
+	    </div>
+	  </form>
+	{% elif method == "POST" %}<!-- show result -->
+	  <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+	    {% for infos in answer %}
+	      <div class="panel panel-default">
+	        <div class="panel-heading" role="tab" id="{{ infos.name }}">
+	          <h4 class="panel-title">
+		    <a role="button" data-toggle="collapse"
+		       data-parent="#accordion" href="#{{ infos.id }}"
+		       aria-controls="{{ infos.id }}">{{ infos.day }}
+		    </a>
+		  </h4>
+	        </div>
+	        <div id="{{ infos.id }}" class="panel-collapse collapse in"
+		     role="tabpanel" aria-labelledby="{{ infos.name }}">
+		  <div class="panel-body">
+		    {% if infos.data.errors %}
+		      Les fichiers ci-après n'existent nulle part:<br>
+                      {{ infos.data.errors|join:"\n" }}
+		    {% endif %}
+                    Fin des programmes: {{ infos.data.stop }}
+		  </div>
+	        </div>
+	      </div>
+            {% endfor %}
+          </div>
+	{% endif %}
+      </div>
+      <div class="modal-footer">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">Retour</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% elif action == "showresult" %}
+<div class="modal fade" id="resultModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+	<button type="button" class="close"
+		data-dismiss="modal" aria-label="Close">
+	  <span aria-hidden="true">&times;</span>
+	</button>
+	<h4 class="modal-title" id="myModalLabel">Résultats par serveur</h4>
+      </div>
+      <div class="modal-body">
+	<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+	  {% for infos in answer %}
+	    <div class="panel panel-default">
+	      <div class="panel-heading" role="tab" id="{{ infos.name }}">
+	        <h4 class="panel-title">
+		  <a role="button" data-toggle="collapse"
+		     data-parent="#accordion" href="#{{ infos.id }}"
+		     aria-controls="{{ infos.id }}">{{ infos.server }}
+		  </a>
+		</h4>
+	      </div>
+	      <div id="{{ infos.id }}" class="panel-collapse collapse in"
+		   role="tabpanel" aria-labelledby="{{ infos.name }}">
+		<div class="panel-body">
+		  <ul>
+		    {% for date, media in infos.data.items %}
+		      <li>{{ date }}: {{ media }}</li>
+		    {% endfor %}
+		  </ul>
+		</div>
+	      </div>
+	    </div>
+          {% endfor %}
+	</div>
+      </div>
+      <div class="modal-footer">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">Retour</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block js %}
+<script>
+var options = [];
+$( '.dropdown-menu a' ).on( 'click', function( event ) {
+var $target = $( event.currentTarget ),
+val = $target.attr( 'data-value' ),
+$inp = $target.find( 'input' ),
+idx;
+if ( ( idx = options.indexOf( val ) ) > -1 ) {
+options.splice( idx, 1 );
+setTimeout( function() { $inp.prop( 'checked', false ) }, 0);
+} else {
+options.push( val );
+setTimeout( function() { $inp.prop( 'checked', true ) }, 0);
+}
+$( event.target ).blur();
+console.log( options );
+return false;
+});
+</script>
+{% if not user.username %}
+<script type="text/javascript">$('#login').modal('show');</script>
+{% elif action in actions %}
+<script type="text/javascript">
+  $('#resultModal').modal('show');
+  $('#resultModal').on('hidden.bs.modal', function (e) {
+    window.location.href = "{% url 'django_nemo:index' %}";
+  });
+  {% if action == "search" %}
+  var options = {
+    valueNames: ['moviename']
+  };
+  var tsfilesList = new List('tsfiles', options);
+  {% elif view == "program" %}
+  $(function () {
+    $('#datetimepicker1').datetimepicker({
+      locale: 'fr',
+      format: 'DDMMYYYY'
+      });
+    });
+  {% endif %}
+</script>
+{% endif %}
+{% endblock %}
