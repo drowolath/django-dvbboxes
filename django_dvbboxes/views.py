@@ -1,5 +1,6 @@
 # encoding: utf-8
 
+import collections
 import dvbboxes
 import os
 from datetime import datetime
@@ -11,7 +12,9 @@ from . import forms
 TOWNS = dvbboxes.TOWNS
 TOWNS.sort()
 
-CHANNELS = dvbboxes.CHANNELS
+CHANNELS = collections.OrderedDict()
+for i in sorted(dvbboxes.CHANNELS):
+    CHANNELS[int(i)] = dvbboxes.CHANNELS[i]
 
 
 def handle_uploaded_file(f):
