@@ -1,0 +1,8 @@
+build/
+deb_dist/
+dist/
+*.tar.gz
+*.egg*/
+*~
+*.py[cod]
+\#*
