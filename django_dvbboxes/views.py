@@ -3,7 +3,7 @@
 import dvbboxes
 import os
 from datetime import datetime
-# from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import redirect, render
 from . import forms
@@ -20,7 +20,7 @@ def handle_uploaded_file(f):
     return path
 
 
-# @login_required
+@login_required
 def index(request):
     """displays home page of the app"""
     context = {
@@ -30,7 +30,7 @@ def index(request):
     return render(request, 'dvbboxes.html', context)
 
 
-# @login_required
+@login_required
 def media(request, **kwargs):
     """view for managing media files throughout the cluster"""
     filename = kwargs.get('filename', '')
@@ -244,7 +244,7 @@ def media(request, **kwargs):
         return render(request, 'dvbboxes.html', context)
 
 
-# @login_required
+@login_required
 def listing(request, **kwargs):
     """view for processing and applying listings"""
     context = {
@@ -289,7 +289,7 @@ def listing(request, **kwargs):
             return render(request, 'dvbboxes.html', context)
 
 
-# @login_required
+@login_required
 def program(request, **kwargs):
     """view for gettings programs"""
     context = {
