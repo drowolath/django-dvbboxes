@@ -2,7 +2,7 @@ import dvbboxes
 from django import forms
 
 TOWNS = ()
-for town in dvbboxes.TOWNS
+for town in dvbboxes.TOWNS:
     TOWNS += ((town, town), )
 
 
