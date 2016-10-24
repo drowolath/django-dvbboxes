@@ -47,7 +47,7 @@ def media(request, **kwargs):
         'method': request.method,
         'filename': filename,
         'town': town,
-        'actions': ['search', 'display', 'rename', 'delete'],
+        'actions': ['media_search', 'display', 'rename', 'delete'],
         }
     if 'delete' in request.path:
         context['action'] = 'delete'
