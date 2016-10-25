@@ -200,9 +200,10 @@ def media(request, **kwargs):
         # display filename informations
         town = kwargs.get('town', '')
         context['town'] = town
-        answer = dvbboxes._media(filename, town=town)
-        duration = answer['duration']
-        towns = answer['towns']
+        answer = {}
+        result = dvbboxes.Media(filename)
+        duration = result.duration
+        towns = list(result.towns)
         towns.sort()
         answer['towns'] = towns or context['all_towns']
         minutes, seconds = divmod(duration, 60)
@@ -210,11 +211,11 @@ def media(request, **kwargs):
         duration = "%02d:%02d:%02d\n" % (hours, minutes, seconds)
         answer['duration'] = duration
         schedule = {}
-        for service_id, timestamps in answer['schedule'].items():
+        for service_id, timestamps in result.schedule.items():
             timestamps.sort()
             schedule[service_id] = [
                 datetime.fromtimestamp(timestamp).strftime(
-                    dvbboxes.settings.DATETIME_FORMAT)
+                    dvbboxes.CONFIG.get('LOG', 'datefmt'))
                 for timestamp in timestamps
                 ]
         answer['schedule'] = schedule
