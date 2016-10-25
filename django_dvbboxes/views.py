@@ -285,7 +285,10 @@ def listing(request, **kwargs):
                         ]
                 # we now define if the parsing is fine
                 limit = datetime.strptime(day, '%d%m%Y') + timedelta(1)
-                length_ok = float(t)+data[start]['duration'] >= limit
+                length_ok = (
+                    datetime.fromtimestamp(
+                        float(t)+data[start]['duration']) >= limit
+                    )
                 if not absent_files and length_ok:
                     success = 0
                 elif absent_files and length_ok:
