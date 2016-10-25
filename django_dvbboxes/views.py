@@ -212,6 +212,7 @@ def media(request, **kwargs):
         answer['duration'] = duration
         schedule = {}
         for service_id, timestamps in result.schedule.items():
+            timestamps = sorted(list(timestamps))
             timestamps.sort()
             schedule[service_id] = [
                 datetime.fromtimestamp(timestamp).strftime(
