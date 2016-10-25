@@ -337,13 +337,13 @@ Rechercher un fichier
 	Ville: {{ town }}
 	{% endif %}
 	<br>
-	Durée: {{ answer.duration }}<br>
+	Durée: {{ answer.duration }}<br><br>
 	{% if answer.schedule %}
 	  <button class="btn btn-primary" type="button" data-toggle="collapse"
 		  data-target="#schedule" aria-expanded="false"
 		  aria-controls="schedule">
 	    Jours et heures de diffusion
-	  </button>
+	  </button><br><br>
 	  <div class="collapse" id="schedule">
 	    <div class="well">
 	      <ul>
@@ -360,6 +360,7 @@ Rechercher un fichier
 	    </div>
 	  </div>
 	{% endif %}
+	  
       </div>
       <div class="modal-footer">
 	<button type="button"
