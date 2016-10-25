@@ -633,18 +633,24 @@ Rechercher un fichier
 	</p><br><br>
 	{% endif %}
 	{% for day, data in result.items %}
-	  <button class="btn btn-primary" type="button" data-toggle="collapse"
+	  <button {% if data.1 %}
+                    class="btn btn-warning"
+                  {% else %}
+                    class="btn btn-success"
+                  {% endif %} 
+		  type="button" data-toggle="collapse"
 		  data-target="#{{ day }}" aria-expanded="false"
 		  aria-controls="{{ day }}">{{ day }}
 	  </button><br><br>
 	  <div class="collapse" id="{{ day }}">
 	    <div class="well">
-	      {% for _, infos in data.items %}
-	        {% if infos.3 %}<b>{% endif %}
-		{{ infos.0 }} - {{ infos.1 }}: {{ infos.2 }}
-		{% if infos.3 %}</b>{% endif %}
+	      {% for _, infos in data.0 %}
+	        {% if infos.2 %}<b>{% endif %}
+		{{ infos.0 }}: {{ infos.1 }}
+		{% if infos.2 %}</b>{% endif %}
 	        <br>
-              {% endfor %}
+	      {% endfor %}
+              <p>Fin des programmes: {{ data.2 }}</p>
 	    </div>
 	  </div>
 	{% endfor %}

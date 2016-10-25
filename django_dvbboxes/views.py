@@ -250,35 +250,40 @@ def listing(request, **kwargs):
             form = forms.UploadListingForm(request.POST)
             form.is_valid()
             filepath = handle_uploaded_file(request.FILES['file'])
-            listing = dvbboxes.Listing(filepath)
+            listing = dvbboxes.Listing(filepath)  # get listing object
             days = sorted(
                 listing.days,
                 key=lambda x: datetime.strptime(x, '%d%m%Y')
-                )
+                )  # sort days in the listing
             missing_files = [
                 i for i, j in listing.filenames.items() if not j
-                ]
-            result = collections.OrderedDict()
+                ]  # detect missing files in the listing
+            result = collections.OrderedDict()  # prepare final result
             for day in days:
-                result[day] = collections.OrderedDict()
+                result[day] = []
             parsed_listing = listing.parse()
             for data in parsed_listing:
+                infos = collections.OrderedDict()
                 data = json.loads(data)
                 day = data['day']
                 del data['day']
                 starts = sorted(data, key=lambda x: float(x.split('_')[1]))
+                colour = 0
                 for start in starts:
                     t, i = start.split('_')
                     start_litteral = datetime.fromtimestamp(
                         float(t)).strftime('%H:%M:%S')
                     stop_litteral = datetime.fromtimestamp(
                         float(t)+data[start]['duration']).strftime(
-                            '%H:%M:%S')
+                            '%d-%m-%Y %H:%M:%S')
                     absent = not data[start]['duration']
+                    if absent:
+                        colour += 1
                     filename = data[start]['filename']
-                    result[day][i] = [
-                        start_litteral, stop_litteral, filename, absent
+                    infos[i] = [
+                        start_litteral, filename, absent
                         ]
+                result[day] = [infos, colour, stop_litteral]
             context['days'] = days
             context['missing_files'] = missing_files
             context['result'] = result
