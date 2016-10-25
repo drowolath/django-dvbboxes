@@ -235,7 +235,7 @@ def listing(request, **kwargs):
     """view for processing and applying listings"""
     context = {
         'view': 'listing',
-        'all_channels': dvbboxes._channels(),
+        'all_channels': CHANNELS,
         'all_towns': TOWNS,
         'method': request.method,
         'actions': ['listing_parse', 'listing_apply', 'listing_showresult'],
