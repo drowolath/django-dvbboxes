@@ -629,7 +629,7 @@ Rechercher un fichier
       <div class="modal-body">
 	{% if missing_files %}
 	<p>
-	  Les fichiers suivants n'existent pas:<br>{{ missing_files|join:"\n" }}
+	  Les fichiers suivants n'existent pas:<br>{{ missing_files|join:"<br>" }}
 	</p><br><br>
 	{% endif %}
 	{% for day, data in result.items %}
@@ -643,6 +643,7 @@ Rechercher un fichier
 	        {% if infos.2 %}<h4>{% endif %}
 		{{ infos.0 }} - {{ infos.1 }}: {{ filename }}
 		{% if infos.2 %}</h4>{% endif %}
+	        <br>
               {% endfor %}
 	    </div>
 	  </div>

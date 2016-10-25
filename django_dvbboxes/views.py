@@ -270,11 +270,10 @@ def listing(request, **kwargs):
                 for start in starts:
                     result[day][data[start]['filename']] = [
                         datetime.fromtimestamp(
-                            float(start)).strftime(
-                                dvbboxes.CONFIG.get('LOG', 'datefmt')),
+                            float(start)).strftime('%H:%M:%S'),
                         datetime.fromtimestamp(
                             float(start)+data[start]['duration']).strftime(
-                                dvbboxes.CONFIG.get('LOG', 'datefmt')),
+                                '%H:%M:%S'),
                         not data[start]['duration']
                         ]
             context['days'] = days
