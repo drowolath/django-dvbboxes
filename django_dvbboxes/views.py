@@ -290,13 +290,13 @@ def listing(request, **kwargs):
                         float(t)+data[start]['duration']) >= limit
                     )
                 if not absent_files and length_ok:
-                    success = 0
+                    success = 0  # green
                 elif absent_files and length_ok:
-                    success = 1
+                    success = 1  # lightblue
                 elif not absent_files and not length_ok:
-                    success = 2
+                    success = 2  # orange
                 else:
-                    success = 3
+                    success = 3  # red
                 result[day] = [infos, success, stop_litteral]
             context['days'] = days
             context['missing_files'] = missing_files
