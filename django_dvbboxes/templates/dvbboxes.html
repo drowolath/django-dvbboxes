@@ -639,10 +639,10 @@ Rechercher un fichier
 	  </button><br><br>
 	  <div class="collapse" id="{{ day }}">
 	    <div class="well">
-	      {% for start, infos in data.items %}
-	        {% if infos.2 %}<h4>{% endif %}
-		{{ start }} - {{ infos.1 }}: {{ infos.0 }}
-		{% if infos.2 %}</h4>{% endif %}
+	      {% for _, infos in data.items %}
+	        {% if infos.3 %}<h4>{% endif %}
+		{{ infos.0 }} - {{ infos.1 }}: {{ infos.2 }}
+		{% if infos.3 %}</h4>{% endif %}
 	        <br>
               {% endfor %}
 	    </div>
