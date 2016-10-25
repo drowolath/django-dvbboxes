@@ -313,7 +313,7 @@ Rechercher un fichier
     </div>
   </div>
 </div>
-{% elif action == "display" %}
+{% elif action == "media_display" %}
 <div class="modal fade" id="resultModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -330,6 +330,15 @@ Rechercher un fichier
 	<a href="{% url 'django_dvbboxes:media_delete_' filename=filename %}">
 	  Supprimer
 	</a>
+	<br>
+	<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+	  Button with data-target
+	</button>
+	<div class="collapse" id="collapseExample">
+	  <div class="well">
+	    ...
+	  </div>
+	  </div>
 	<br>
 	{% if not town %}
 	Villes: {{ answer.towns|join:", " }}
@@ -360,7 +369,7 @@ Rechercher un fichier
     </div>
   </div>
 </div>
-{% elif action == "rename" %}
+{% elif action == "media_rename" %}
 <div class="modal fade" id="resultModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -412,7 +421,7 @@ Rechercher un fichier
     </div>
   </div>
 </div>
-{% elif action == "delete" %}
+{% elif action == "media_delete" %}
 <div class="modal fade" id="resultModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">

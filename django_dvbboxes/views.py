@@ -47,10 +47,15 @@ def media(request, **kwargs):
         'method': request.method,
         'filename': filename,
         'town': town,
-        'actions': ['media_search', 'display', 'rename', 'delete'],
+        'actions': [
+            'media_search',
+            'media_display',
+            'media_rename',
+            'media_delete'
+            ],
         }
     if 'delete' in request.path:
-        context['action'] = 'delete'
+        context['action'] = 'media_delete'
         if request.method == 'GET':
             # If no filename's provided nor towns,
             # the form will be an UploadFileForm (POST media_delete).
@@ -141,7 +146,7 @@ def media(request, **kwargs):
             else:
                 raise Http404("this ressource does not exist")
     elif 'media/rename' in request.path:
-        context['action'] = 'rename'
+        context['action'] = 'media_rename'
         if request.method == 'GET':
             if not filename:
                 raise Http404("this ressource does not exist")
@@ -196,7 +201,7 @@ def media(request, **kwargs):
                     )
                 return render(request, 'dvbboxes.html', context)
     else:
-        context['action'] = 'display'
+        context['action'] = 'media_display'
         # display filename informations
         town = kwargs.get('town', '')
         context['town'] = town
