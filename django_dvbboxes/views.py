@@ -266,7 +266,7 @@ def listing(request, **kwargs):
                 data = json.loads(data)
                 day = data['day']
                 del data['day']
-                starts = sorted(data)
+                starts = sorted(data, key=lambda x: float(x))
                 for start in starts:
                     result[day][data[start]['filename']] = [
                         datetime.fromtimestamp(
@@ -279,6 +279,7 @@ def listing(request, **kwargs):
             context['days'] = days
             context['missing_files'] = missing_files
             context['result'] = result
+            print bonobo
             return render(request, 'dvbboxes.html', context)
 
 
