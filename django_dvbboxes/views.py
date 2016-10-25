@@ -4,7 +4,7 @@ import collections
 import dvbboxes
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import redirect, render
@@ -268,7 +268,7 @@ def listing(request, **kwargs):
                 day = data['day']
                 del data['day']
                 starts = sorted(data, key=lambda x: float(x.split('_')[1]))
-                colour = 0
+                absent_files = 0
                 for start in starts:
                     t, i = start.split('_')
                     start_litteral = datetime.fromtimestamp(
@@ -278,12 +278,23 @@ def listing(request, **kwargs):
                             '%d-%m-%Y %H:%M:%S')
                     absent = not data[start]['duration']
                     if absent:
-                        colour += 1
+                        absent_files += 1
                     filename = data[start]['filename']
                     infos[i] = [
                         start_litteral, filename, absent
                         ]
-                result[day] = [infos, colour, stop_litteral]
+                # we now define if the parsing is fine
+                limit = datetime.strptime(day, '%d%m%Y') + timedelta(1)
+                length_ok = float(t)+data[start]['duration'] >= limit
+                if not absent_files and length_ok:
+                    success = 0
+                elif absent_files and length_ok:
+                    success = 1
+                elif not absent_files and not length_ok:
+                    success = 2
+                else:
+                    success = 3
+                result[day] = [infos, success, stop_litteral]
             context['days'] = days
             context['missing_files'] = missing_files
             context['result'] = result

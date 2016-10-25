@@ -633,10 +633,14 @@ Rechercher un fichier
 	</p><br><br>
 	{% endif %}
 	{% for day, data in result.items %}
-	  <button {% if data.1 %}
-                    class="btn btn-warning"
-                  {% else %}
+	  <button {% if data.1 == 0 %}
                     class="btn btn-success"
+                  {% elif data.1 == 1 %}
+                    class="btn btn-info"
+                  {% elif data.1 == 2 %}
+                    class="btn btn-warning"
+                  {% elif data.1 == 3 %}
+                    class="btn btn-danger"
                   {% endif %} 
 		  type="button" data-toggle="collapse"
 		  data-target="#{{ day }}" aria-expanded="false"
