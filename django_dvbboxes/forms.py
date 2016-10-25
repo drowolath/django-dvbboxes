@@ -12,6 +12,11 @@ class SearchMediaForm(forms.Form):
     town = forms.MultipleChoiceField(choices=TOWNS, required=False)
 
 
+class UploadListingForm(forms.Form):
+    """uploading a listing"""
+    file = forms.FileField(required=True)
+
+
 class StandardForm(forms.Form):
     """given text, apply proper action throughout cluster"""
     expression = forms.CharField(max_length=100, required=True)

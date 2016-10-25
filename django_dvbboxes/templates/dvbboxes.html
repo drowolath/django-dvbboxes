@@ -168,22 +168,6 @@ Rechercher un fichier
 	      action="{% url 'django_dvbboxes:listing' %}"
 	      enctype="multipart/form-data">{% csrf_token %}
 	  <div class="input-group" style="width:340px;margin:0 auto;">
-	    <span class="input-group-btn">
-	      <button type="button" class="btn dropdown-toggle" id="dropdownTown"
-		      data-toggle="dropdown">
-	        <span class="glyphicon glyphicon-tasks"></span> <span class="caret"></span>
-	      </button>
-	      <ul class="dropdown-menu" aria-labelledby="dropdownTown">
-	      {% for town in all_towns %}
-	        <li>
-	          <a href="#" data-value="{{ town }}">
-		    <input type="checkbox" value="{{ town }}" name="towns"/>
-		    &nbsp;{{ town|capfirst }}
-		  </a>
-	        </li>
-	      {% endfor %}
-	      </ul>
-	    </span>
 	    <label class="btn" for="my-file-selector">
 	      <input id="my-file-selector" type="file"
 		     style="display:none;" name="file"
@@ -631,7 +615,7 @@ Rechercher un fichier
     </div>
   </div>
 </div>
-{% elif action == "parse" %}
+{% elif action == "listing_parse" %}
 <div class="modal fade" id="resultModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -640,57 +624,29 @@ Rechercher un fichier
 		data-dismiss="modal" aria-label="Close">
 	  <span aria-hidden="true">&times;</span>
 	</button>
-	{% if method == "GET" %}
-	  <h4 class="modal-title" id="myModalLabel">Chargez un listing</h4>
-	{% elif method == "POST" %}
-          <h4 class="modal-title" id="myModalLabel">Résultat de l'analyse</h4>
-        {% endif %}
+        <h4 class="modal-title" id="myModalLabel">Résultat de l'analyse</h4>
       </div>
       <div class="modal-body">
-	{% if method == "GET" %}<!--show form -->
-	  <form class="col-lg-12"
-	        role="form"
-	        method="POST"
-	        action="{% url 'django_dvbboxes:listing' %}"
-                enctype="multipart/form-data">{% csrf_token %}
-	    <div class="input-group" style="width:340px;margin:0 auto;">
-	      <label class="btn" for="my-file-selector">
-	        <input id="my-file-selector" type="file"
-		       style="display:none;" name="file"
-		       onchange="$('#upload-file-info').html($(this).val());"> Parcourir...
-	      </label>
-	      <span class='label label-info' id="upload-file-info"></span>
-	      <span class="input-group-btn">
-	        <button class="btn btn-small btn-primary" type="submit">Go!</button>
-	      </span>
-	    </div>
-	  </form>
-	{% elif method == "POST" %}<!-- show result -->
-	  <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-	    {% for infos in answer %}
-	      <div class="panel panel-default">
-	        <div class="panel-heading" role="tab" id="{{ infos.name }}">
-	          <h4 class="panel-title">
-		    <a role="button" data-toggle="collapse"
-		       data-parent="#accordion" href="#{{ infos.id }}"
-		       aria-controls="{{ infos.id }}">{{ infos.day }}
-		    </a>
-		  </h4>
-	        </div>
-	        <div id="{{ infos.id }}" class="panel-collapse collapse in"
-		     role="tabpanel" aria-labelledby="{{ infos.name }}">
-		  <div class="panel-body">
-		    {% if infos.data.errors %}
-		      Les fichiers ci-après n'existent nulle part:<br>
-                      {{ infos.data.errors|join:"\n" }}
-		    {% endif %}
-                    Fin des programmes: {{ infos.data.stop }}
-		  </div>
-	        </div>
-	      </div>
-            {% endfor %}
-          </div>
+	{% if missing_files %}
+	<p>
+	  Les fichiers suivants n'existent pas:<br>{{ missing_files|join:"\n" }}
+	</p><br><br>
 	{% endif %}
+	{% for day, data in result.items %}
+	  <button class="btn btn-primary" type="button" data-toggle="collapse"
+		  data-target="#{{ day }}" aria-expanded="false"
+		  aria-controls="{{ day }}">{{ day }}
+	  </button><br><br>
+	  <div class="collapse" id="{{ day }}">
+	    <div class="well">
+	      {% for filename, infos in data.items %}
+	        {% if infos.2 %}<h4>{% endif %}
+		{{ infos.0 }} - {{ infos.1 }}: {{ filename }}
+		{% if infos.2 %}</h4>{% endif %}
+              {% endfor %}
+	    </div>
+	  </div>
+	{% endfor %}
       </div>
       <div class="modal-footer">
 	<button type="button" class="btn btn-default"
