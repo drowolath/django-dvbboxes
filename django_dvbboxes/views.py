@@ -260,7 +260,7 @@ def listing(request, **kwargs):
                 ]
             result = collections.OrderedDict()
             for day in days:
-                result[day] = {}
+                result[day] = collections.OrderedDict()
             parsed_listing = listing.parse()
             for data in parsed_listing:
                 data = json.loads(data)
@@ -279,7 +279,6 @@ def listing(request, **kwargs):
             context['days'] = days
             context['missing_files'] = missing_files
             context['result'] = result
-            print bonobo
             return render(request, 'dvbboxes.html', context)
 
 
