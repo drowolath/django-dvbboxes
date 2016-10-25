@@ -644,7 +644,7 @@ Rechercher un fichier
 	  </button><br><br>
 	  <div class="collapse" id="{{ day }}">
 	    <div class="well">
-	      {% for _, infos in data.0 %}
+	      {% for _, infos in data.0.items %}
 	        {% if infos.2 %}<b>{% endif %}
 		{{ infos.0 }}: {{ infos.1 }}
 		{% if infos.2 %}</b>{% endif %}
