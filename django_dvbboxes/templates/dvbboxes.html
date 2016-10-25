@@ -360,7 +360,19 @@ Rechercher un fichier
 	    </div>
 	  </div>
 	{% endif %}
-	  
+        <form>
+	  <div class="form-group">
+	    <label for="name">Titre:</label>
+	    <input class="form-control" name="name" value="{{ filename }}"/>
+	  </div>
+	  <div class="form-group">
+	    <label for="desc">Synopsis:</label>
+	    <textarea class="form-control" rows="6" name="desc"></textarea>
+	  </div>
+	  <div class="form-group">
+	    <button class="btn btn-primary" type="submit">Sauvegarder</button>
+	  </div>
+	</form>
       </div>
       <div class="modal-footer">
 	<button type="button"
