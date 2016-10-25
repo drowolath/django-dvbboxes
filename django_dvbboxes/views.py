@@ -268,13 +268,15 @@ def listing(request, **kwargs):
                 del data['day']
                 starts = sorted(data, key=lambda x: float(x))
                 for start in starts:
-                    result[day][data[start]['filename']] = [
-                        datetime.fromtimestamp(
-                            float(start)).strftime('%H:%M:%S'),
-                        datetime.fromtimestamp(
-                            float(start)+data[start]['duration']).strftime(
-                                '%H:%M:%S'),
-                        not data[start]['duration']
+                    start_litteral = datetime.fromtimestamp(
+                        float(start)).strftime('%H:%M:%S')
+                    stop_litteral = datetime.fromtimestamp(
+                        float(start)+data[start]['duration']).strftime(
+                            '%H:%M:%S')
+                    absent = not data[start]['duration']
+                    filename = data[start]['filename']
+                    result[day][start_litteral] = [
+                        filename, stop_litteral, absent
                         ]
             context['days'] = days
             context['missing_files'] = missing_files
