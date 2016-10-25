@@ -263,23 +263,22 @@ def listing(request, **kwargs):
                 result[day] = collections.OrderedDict()
             parsed_listing = listing.parse()
             for data in parsed_listing:
-                index = 0
                 data = json.loads(data)
                 day = data['day']
                 del data['day']
-                starts = sorted(data, key=lambda x: float(x))
+                starts = sorted(data, key=lambda x: float(x.split('_')[0]))
                 for start in starts:
+                    t, i = start.split('_')
                     start_litteral = datetime.fromtimestamp(
-                        float(start)).strftime('%H:%M:%S')
+                        float(t)).strftime('%H:%M:%S')
                     stop_litteral = datetime.fromtimestamp(
-                        float(start)+data[start]['duration']).strftime(
+                        float(t)+data[start]['duration']).strftime(
                             '%H:%M:%S')
                     absent = not data[start]['duration']
                     filename = data[start]['filename']
-                    result[day][index] = [
+                    result[day][i] = [
                         start_litteral, stop_litteral, filename, absent
                         ]
-                    index += 1
             context['days'] = days
             context['missing_files'] = missing_files
             context['result'] = result
