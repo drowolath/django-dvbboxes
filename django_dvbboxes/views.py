@@ -248,39 +248,39 @@ def listing(request, **kwargs):
         else:
             context['action'] = 'listing_parse'
             form = forms.UploadListingForm(request.POST)
-            if form.is_valid():
-                filepath = handle_uploaded_file(request.FILES['file'])
-                listing = dvbboxes.Listing(filepath)
-                days = sorted(
-                    listing.days,
-                    key=lambda x: datetime.strptime(x, '%d%m%Y')
-                    )
-                missing_files = [
-                    i for i, j in listing.filenames.items() if not j
-                    ]
-                result = collections.OrderedDict()
-                for day in days:
-                    result[day] = {}
-                parsed_listing = listing.parse()
-                for data in parsed_listing:
-                    data = json.loads(data)
-                    day = data['day']
-                    del data['day']
-                    starts = sorted(data)
-                    for start in starts:
-                        result[day][data[start]['filename']] = [
-                            datetime.fromtimestamp(
-                                start).strftime(
-                                    dvbboxes.CONFIG.get('LOG', 'datefmt')),
-                            datetime.fromtimestamp(
-                                start+data[start]['duration']).strftime(
-                                    dvbboxes.CONFIG.get('LOG', 'datefmt')),
-                            not data[start]['duration']
-                            ]
-                context['days'] = days
-                context['missing_files'] = missing_files
-                context['result'] = result
-                return render(request, 'dvbboxes.html', context)
+            form.is_valid()
+            filepath = handle_uploaded_file(request.FILES['file'])
+            listing = dvbboxes.Listing(filepath)
+            days = sorted(
+                listing.days,
+                key=lambda x: datetime.strptime(x, '%d%m%Y')
+                )
+            missing_files = [
+                i for i, j in listing.filenames.items() if not j
+                ]
+            result = collections.OrderedDict()
+            for day in days:
+                result[day] = {}
+            parsed_listing = listing.parse()
+            for data in parsed_listing:
+                data = json.loads(data)
+                day = data['day']
+                del data['day']
+                starts = sorted(data)
+                for start in starts:
+                    result[day][data[start]['filename']] = [
+                        datetime.fromtimestamp(
+                            start).strftime(
+                                dvbboxes.CONFIG.get('LOG', 'datefmt')),
+                        datetime.fromtimestamp(
+                            start+data[start]['duration']).strftime(
+                                dvbboxes.CONFIG.get('LOG', 'datefmt')),
+                        not data[start]['duration']
+                        ]
+            context['days'] = days
+            context['missing_files'] = missing_files
+            context['result'] = result
+            return render(request, 'dvbboxes.html', context)
 
 
 @login_required
