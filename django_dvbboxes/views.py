@@ -237,16 +237,15 @@ def listing(request, **kwargs):
         'all_channels': dvbboxes._channels(),
         'all_towns': TOWNS,
         'method': request.method,
-        'actions': ['parse', 'apply', 'showresult'],
+        'actions': ['listing_parse', 'listing_apply', 'listing_showresult'],
         }
     if request.method == 'GET':
-        context['action'] = 'parse'
-        return render(request, 'dvbboxes.html', context)
+        return redirect('index')
     elif request.method == 'POST':
         if 'listing/apply' in request.path:
             return render(request, 'dvbboxes.html', context)
         else:
-            context['action'] = 'parse'
+            context['action'] = 'listing_parse'
             form = forms.UploadForm(request.POST)
             if form.is_valid():
                 filepath = handle_uploaded_file(request.FILES['file'])

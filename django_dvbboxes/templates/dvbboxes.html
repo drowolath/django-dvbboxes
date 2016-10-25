@@ -166,8 +166,24 @@ Rechercher un fichier
 	      role="form"
 	      method="POST"
 	      action="{% url 'django_dvbboxes:listing' %}"
-              enctype="multipart/form-data">{% csrf_token %}
+	      enctype="multipart/form-data">{% csrf_token %}
 	  <div class="input-group" style="width:340px;margin:0 auto;">
+	    <span class="input-group-btn">
+	      <button type="button" class="btn dropdown-toggle" id="dropdownTown"
+		      data-toggle="dropdown">
+	        <span class="glyphicon glyphicon-tasks"></span> <span class="caret"></span>
+	      </button>
+	      <ul class="dropdown-menu" aria-labelledby="dropdownTown">
+	      {% for town in all_towns %}
+	        <li>
+	          <a href="#" data-value="{{ town }}">
+		    <input type="checkbox" value="{{ town }}" name="towns"/>
+		    &nbsp;{{ town|capfirst }}
+		  </a>
+	        </li>
+	      {% endfor %}
+	      </ul>
+	    </span>
 	    <label class="btn" for="my-file-selector">
 	      <input id="my-file-selector" type="file"
 		     style="display:none;" name="file"
