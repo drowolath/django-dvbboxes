@@ -266,7 +266,7 @@ def listing(request, **kwargs):
                 data = json.loads(data)
                 day = data['day']
                 del data['day']
-                starts = sorted(data, key=lambda x: float(x.split('_')[0]))
+                starts = sorted(data, key=lambda x: float(x.split('_')[1]))
                 for start in starts:
                     t, i = start.split('_')
                     start_litteral = datetime.fromtimestamp(
