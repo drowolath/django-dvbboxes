@@ -331,15 +331,6 @@ Rechercher un fichier
 	  Supprimer
 	</a>
 	<br>
-	<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-	  Button with data-target
-	</button>
-	<div class="collapse" id="collapseExample">
-	  <div class="well">
-	    ...
-	  </div>
-	  </div>
-	<br>
 	{% if not town %}
 	Villes: {{ answer.towns|join:", " }}
 	{% else %}
@@ -348,18 +339,26 @@ Rechercher un fichier
 	<br>
 	Durée: {{ answer.duration }}<br>
 	{% if answer.schedule %}
-	  <h5>Ci-dessous, la programmation par chaine: </h5><br>
-	    <ul>
-	      {% for service_id, timestamps in answer.schedule.items %}
-	        <li>{{ service_id }}:
-		  <ul>
-		    {% for timestamp in timestamps %}
-		      <li>{{ timestamp }}</li>
-		    {% endfor %}
-		  </ul>
-	        </li>
-	      {% endfor %}
-	    </ul>
+	  <button class="btn btn-primary" type="button" data-toggle="collapse"
+		  data-target="#schedule" aria-expanded="false"
+		  aria-controls="schedule">
+	    Jours et heures de diffusion
+	  </button>
+	  <div class="collapse" id="schedule">
+	    <div class="well">
+	      <ul>
+	        {% for service_id, timestamps in answer.schedule.items %}
+	          <li>{{ service_id }}:
+		    <ul>
+		      {% for timestamp in timestamps %}
+		        <li>{{ timestamp }}</li>
+		      {% endfor %}
+		    </ul>
+	          </li>
+	        {% endfor %}
+	      </ul>	    
+	    </div>
+	  </div>
 	{% endif %}
       </div>
       <div class="modal-footer">
