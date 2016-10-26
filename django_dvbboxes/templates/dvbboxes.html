@@ -338,7 +338,8 @@ Rechercher un fichier
 	    </div>
 	  </div>
 	{% endif %}
-        <form>
+        <form method="POST"
+              action="{% url 'django_dvbboxes:media_infos_' filename=filename%}">{% csrf_token %}
 	  <div class="form-group">
 	    <label for="name">Titre:</label>
 	    <input class="form-control" name="name" value="{{ db.name }}"/>
