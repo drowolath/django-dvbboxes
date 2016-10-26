@@ -4,11 +4,16 @@ import collections
 import dvbboxes
 import json
 import os
+import shlex
+import string
+import subprocess
+import xmltodict
 from datetime import datetime, timedelta
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
 from django.shortcuts import redirect, render
-from . import forms
+from . import forms, models
 
 TOWNS = dvbboxes.TOWNS
 TOWNS.sort()
@@ -24,6 +29,128 @@ def handle_uploaded_file(f):
         for chunk in f.chunks():
             destination.write(chunk)
     return path
+
+
+def build_tmira_datetime(dt):
+    u"""le format d'entrée est %d-%m-%Y %H:%M:%S"""
+    date, hour = dt.split()
+    day, month, year = date.split('-')
+    result = '{year}-{month}-{day}T{hour}+03:00'.format(
+        hour=hour, year=year, month=month, day=day)
+    return result
+
+
+def createtitle(name):
+    """create title out of filename"""
+    name = name
+    if name.endswith('.ts'):
+        name = name[:-3]
+    header = name
+    name = header.replace('_', ' ').title()
+    letters = [
+        i for i in string.letters[26:]
+        if i not in ['A', 'E', 'I', 'O']
+        ]
+    for letter in letters:
+        if ' '+letter+' ' in name:
+            name = name.replace(letter+' ', letter+"'")
+    bar = [i for i in name.split("'")[:-1] if len(i) > 1]
+    for j in bar:
+        name = name.replace(j+"'", j+" ")
+    if name.startswith('Ba '):
+        name = name.replace('Ba ', 'Bande Annonce ')
+    else:
+        name = name.replace(' Ctv4', '')
+        name = name.replace(' Ctv3', '')
+        name = name.replace(' Ctv2', '')
+        name = name.replace(' Ctv', '')
+    return name
+
+
+def buildxml(parsed_data, service_id):
+    """create xml files for epg"""
+    for data in parsed_data:
+        day = data['day']
+        del data['day']
+        keys = sorted(data, key=lambda x: int(x.split('_')[1]))
+        xml = {
+            'BroadcastData': {
+                'ProviderInfo': {
+                    'ProviderId': '',
+                    'ProviderName': '',
+                    },
+                'ScheduleData': {
+                    'ChannelPeriod': {
+                        'ChannelId': service_id,
+                        'Event': [],
+                        },
+                    },
+                },
+            }
+        channelperiod = xml['BroadcastData']['ScheduleData']
+        channelperiod = channelperiod['ChannelPeriod']
+        for key in keys:
+            timestamp, index = key.split('_')
+            info = data[key]
+            filename = info['filename']
+            if not filename.endswith('.ts'):
+                filename += '.ts'
+            if not filename.startswith('ba_'):
+                media = models.Media.objects.filter(
+                    filename__startswith=filename)
+                if media:
+                    media = media.first()
+                    name = media.name
+                    desc = media.desc
+                else:
+                    desc = ''
+                    name = createtitle(filename)
+                if '@beginTime' not in channelperiod:
+                    channelperiod['@beginTime'] = build_tmira_datetime(
+                        datetime.fromtimestamp(
+                            float(timestamp)).strftime('%d-%m-%Y %H:%M:%S'))
+                event = {
+                    '@duration': str(info['duration']),
+                    '@beginTime': build_tmira_datetime(
+                        datetime.fromtimestamp(
+                            float(timestamp)).strftime('%d-%m-%Y %H:%M:%S')),
+                    'EventType': 'S',
+                    'FreeAccess': '1',
+                    'Unscrambled': '1',
+                    'EpgProduction': {
+                        'ParentalRating': {
+                            '@countryCode': "MDG",
+                            '#text': '0',
+                            },
+                        'DvbContent': {
+                            'Content': {
+                                '@nibble2': '0',
+                                '@nibble1': '0',
+                                },
+                            },
+                        'EpgText': {
+                            '@language': 'fre',
+                            'ShortDescription': '',
+                            'Description': desc,
+                            'Name': name,
+                            },
+                        },
+                    }
+                channelperiod['Event'].append(event)
+        else:
+            channelperiod['@endTime'] = build_tmira_datetime(
+                datetime.fromtimestamp(
+                    float(timestamp)).strftime('%d-%m-%Y %H:%M:%S'))
+        folder = [
+            i[-1] for i in settings.STATICFILES_DIRS if i[0] == 'xml'
+            ]
+        folder = folder.pop()
+        xmlfile = os.path.join(folder, '{0}_{1}'.format(service_id, day))
+        with open(xmlfile+'.xml', 'w') as f:
+            f.write(xmltodict.unparse(xml))
+    cmd = ("python /usr/local/share/dvb/nemo/manage.py "
+           "collectstatic --noinput")
+    subprocess.call(shlex.split(cmd))
 
 
 @login_required
@@ -238,7 +365,7 @@ def listing(request, **kwargs):
         'all_channels': CHANNELS,
         'all_towns': TOWNS,
         'method': request.method,
-        'actions': ['listing_parse', 'listing_apply', 'listing_showresult'],
+        'actions': ['listing_parse', 'listing_apply'],
         }
     if request.method == 'GET':
         return redirect('index')
@@ -247,14 +374,15 @@ def listing(request, **kwargs):
             context['action'] = 'listing_apply'
             form = forms.ApplyListingForm(request.POST)
             form.is_valid()
-            result = json.loads(form.cleaned_data['parsed_data'])
+            parsed_data = json.loads(form.cleaned_data['parsed_data'])
             service_id = form.cleaned_data['service_id']
             towns = request.POST.getlist('towns')
             towns.sort()
-            if not towns:
-                towns = TOWNS
-            print bonobo
-            return render(request, 'dvbboxes.html', context)
+            # apply listing to servers in towns
+            dvbboxes.Listing.apply(parsed_data, service_id, towns)
+            # create xml files
+            buildxml(parsed_data, service_id)
+            return redirect('index')
         else:
             context['action'] = 'listing_parse'
             form = forms.UploadListingForm(request.POST)
