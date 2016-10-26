@@ -645,7 +645,7 @@ Rechercher un fichier
 		  type="button" data-toggle="collapse"
 		  data-target="#{{ day }}" aria-expanded="false"
 		  aria-controls="{{ day }}">{{ day }}
-	  </button><a href=<br><br>
+	  </button><br><br>
 	  <div class="collapse" id="{{ day }}">
 	    <div class="well">
 	      {% for _, infos in data.0.items %}
@@ -659,7 +659,8 @@ Rechercher un fichier
 	  </div>
 	{% endfor %}
 	<br><br>
-        <p>Appliquez votre listing en choisissant une ville et une chaine</p>  
+        <p>Appliquez votre listing en choisissant une ville et une chaine</p>
+	<div>
 	<form class="col-lg-12"
 	      role="form"
 	      method="POST"
@@ -700,7 +701,8 @@ Rechercher un fichier
 	      <button class="btn btn-small btn-primary" type="submit">Appliquer</button>
 	    </span>
 	  </div>
-	</form> 
+	</form>
+        </div>
       </div>
       <div class="modal-footer">
 	<button type="button" class="btn btn-default"
