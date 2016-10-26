@@ -272,9 +272,11 @@ def listing(request, **kwargs):
             for day in days:
                 result[day] = []
             parsed_listing = listing.parse()
+            json_result = []
             for data in parsed_listing:
                 infos = collections.OrderedDict()
                 data = json.loads(data)
+                json_result.append(data)
                 day = data['day']
                 del data['day']
                 starts = sorted(data, key=lambda x: float(x.split('_')[1]))
@@ -311,7 +313,7 @@ def listing(request, **kwargs):
             context['days'] = days
             context['missing_files'] = missing_files
             context['result'] = result
-            context['json_result'] = json.dumps(result)
+            context['json_result'] = json.dumps(json_result)
             return render(request, 'dvbboxes.html', context)
 
 
