@@ -141,16 +141,12 @@ def buildxml(parsed_data, service_id):
             channelperiod['@endTime'] = build_tmira_datetime(
                 datetime.fromtimestamp(
                     float(timestamp)).strftime('%d-%m-%Y %H:%M:%S'))
-        folder = [
-            i[-1] for i in settings.STATICFILES_DIRS if i[0] == 'xml'
-            ]
-        folder = folder.pop()
-        xmlfile = os.path.join(folder, '{0}_{1}'.format(service_id, day))
+        xmlfile = os.path.join(
+            settings.XMLTV,
+            '{0}_{1}'.format(service_id, day)
+            )
         with open(xmlfile+'.xml', 'w') as f:
             f.write(xmltodict.unparse(xml))
-    cmd = ("python /usr/local/share/dvb/nemo/manage.py "
-           "collectstatic --noinput")
-    subprocess.call(shlex.split(cmd))
 
 
 @login_required
