@@ -349,28 +349,44 @@ def media(request, **kwargs):
                 desc=''
                 )
             mediaobject.save()
-        context['db'] = mediaobject
-        result = dvbboxes.Media(filename)
-        duration = result.duration
-        towns = list(result.towns)
-        towns.sort()
-        answer['towns'] = towns or context['all_towns']
-        minutes, seconds = divmod(duration, 60)
-        hours, minutes = divmod(minutes, 60)
-        duration = "%02d:%02d:%02d\n" % (hours, minutes, seconds)
-        answer['duration'] = duration
-        schedule = {}
-        for service_id, timestamps in result.schedule.items():
-            timestamps = sorted(list(timestamps))
-            timestamps.sort()
-            schedule[service_id] = [
-                datetime.fromtimestamp(timestamp).strftime(
-                    dvbboxes.CONFIG.get('LOG', 'datefmt'))
-                for timestamp in timestamps
-                ]
-        answer['schedule'] = schedule
-        context['answer'] = answer
-        return render(request, 'dvbboxes.html', context)
+        if request.method == 'POST':
+            form = forms.MediaInfosForm(request.POST)
+            form.is_valid()
+            name = form.cleaned_data['name']
+            desc = form.cleaned_data['desc']
+            sem = False
+            if name != mediaobject.name:
+                mediaobject.name = name
+                sem = True
+            if desc != mediaobject.desc:
+                mediaobject.desc = desc
+                sem = True
+            if sem:
+                mediaobject.save()
+            return redirect('media_infos_', filename=filename)
+        else:
+            context['db'] = mediaobject
+            result = dvbboxes.Media(filename)
+            duration = result.duration
+            towns = list(result.towns)
+            towns.sort()
+            answer['towns'] = towns or context['all_towns']
+            minutes, seconds = divmod(duration, 60)
+            hours, minutes = divmod(minutes, 60)
+            duration = "%02d:%02d:%02d\n" % (hours, minutes, seconds)
+            answer['duration'] = duration
+            schedule = {}
+            for service_id, timestamps in result.schedule.items():
+                timestamps = sorted(list(timestamps))
+                timestamps.sort()
+                schedule[service_id] = [
+                    datetime.fromtimestamp(timestamp).strftime(
+                        dvbboxes.CONFIG.get('LOG', 'datefmt'))
+                    for timestamp in timestamps
+                    ]
+            answer['schedule'] = schedule
+            context['answer'] = answer
+            return render(request, 'dvbboxes.html', context)
 
 
 @login_required

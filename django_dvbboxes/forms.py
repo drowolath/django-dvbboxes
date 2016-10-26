@@ -15,6 +15,10 @@ class SearchMediaForm(forms.Form):
     expression = forms.CharField(max_length=100, required=True)
     towns = forms.MultipleChoiceField(choices=TOWNS, required=False)
 
+class MediaInfosForm(forms.Form):
+    name = forms.CharField(max_length=100, required=True)
+    desc = forms.Textarea(max_length=1000000, required=False)
+
 
 class UploadListingForm(forms.Form):
     """uploading a listing"""
