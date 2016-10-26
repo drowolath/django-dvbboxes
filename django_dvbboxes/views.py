@@ -175,7 +175,7 @@ def media(request, **kwargs):
         }
     if 'media/delete' in request.path:
         if request.method == 'GET':
-            return redirect('index')
+            return redirect('django_dvbboxes:index')
         elif request.method == 'POST':
             if filename:
                 for _, servers in dvbboxes.CLUSTER.items():
@@ -185,7 +185,7 @@ def media(request, **kwargs):
                                    server=server,
                                    name=filename)
                         subprocess.Popen(shlex.split(cmd))
-                return redirect('media_info', filename=filename)
+                return redirect('django_dvbboxes:media_info', filename=filename)
             else:
                 form = forms.DeleteBatchMediaForm(request.POST)
                 form.is_valid()
@@ -205,10 +205,10 @@ def media(request, **kwargs):
                                                server=server,
                                                name=line)
                                     subprocess.Popen(shlex.split(cmd))
-                return redirect('index')
+                return redirect('django_dvbboxes:index')
     elif 'media/rename' in request.path:
         if request.method == 'GET':
-            return redirect('index')
+            return redirect('django_dvbboxes:index')
         elif request.method == 'POST':
             form = forms.RenameMediaForm(request.POST)
             form.is_valid()
@@ -225,10 +225,10 @@ def media(request, **kwargs):
                                new_name=new_name
                                )
                     subprocess.Popen(shlex.split(cmd))
-            return redirect('media_info', filename=new_name.rstrip('.ts'))
+            return redirect('django_dvbboxes:media_info', filename=new_name.rstrip('.ts'))
     elif 'media/search' in request.path:
         if request.method == 'GET':
-            return redirect('index')
+            return redirect('django_dvbboxes:index')
         elif request.method == 'POST':
             context['action'] = 'media_search'
             form = forms.SearchMediaForm(request.POST)
@@ -285,7 +285,7 @@ def media(request, **kwargs):
                 sem = True
             if sem:
                 mediaobject.save()
-            return redirect('media_infos_', filename=filename)
+            return redirect('django_dvbboxes:media_infos_', filename=filename)
         else:
             context['db'] = mediaobject
             result = dvbboxes.Media(filename)
@@ -322,7 +322,7 @@ def listing(request, **kwargs):
         'actions': ['listing_parse', 'listing_apply'],
         }
     if request.method == 'GET':
-        return redirect('index')
+        return redirect('django_dvbboxes:index')
     elif request.method == 'POST':
         if 'listing/apply' in request.path:
             context['action'] = 'listing_apply'
@@ -336,7 +336,7 @@ def listing(request, **kwargs):
             dvbboxes.Listing.apply(parsed_data, service_id, towns)
             # create xml files
             buildxml(parsed_data, service_id)
-            return redirect('index')
+            return redirect('django_dvbboxes:index')
         else:
             context['action'] = 'listing_parse'
             form = forms.UploadListingForm(request.POST)
@@ -410,7 +410,7 @@ def program(request, **kwargs):
         'actions': ['program_display'],
         }
     if request.method == 'GET':
-        return redirect('index')
+        return redirect('django_dvbboxes:index')
     elif request.method == 'POST':
         context['action'] = 'program_display'
         form = forms.ProgramForm(request.POST)
