@@ -28,7 +28,7 @@ urlpatterns = [
         views.media,
         name='media_infos_'),
     # views.listing urls
-    url(r'listing/apply/(?P<service_id>\d+)/$',
+    url(r'listing/apply/$',
         views.listing,
         name='applylisting'),
     url(r'listing/$', views.listing, name='listing'),

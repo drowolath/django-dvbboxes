@@ -244,6 +244,16 @@ def listing(request, **kwargs):
         return redirect('index')
     elif request.method == 'POST':
         if 'listing/apply' in request.path:
+            context['action'] = 'listing_apply'
+            form = forms.ApplyListingForm(request.POST)
+            form.is_valid()
+            result = json.loads(form.cleaned_data['parsed_data'])
+            service_id = form.cleaned_data['service_id']
+            towns = request.POST.getlist('towns')
+            towns.sort()
+            if not towns:
+                towns = TOWNS
+            print bonobo
             return render(request, 'dvbboxes.html', context)
         else:
             context['action'] = 'listing_parse'
@@ -301,6 +311,7 @@ def listing(request, **kwargs):
             context['days'] = days
             context['missing_files'] = missing_files
             context['result'] = result
+            context['json_result'] = json.dumps(result)
             return render(request, 'dvbboxes.html', context)
 
 
