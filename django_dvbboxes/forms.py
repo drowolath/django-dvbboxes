@@ -18,7 +18,7 @@ class SearchMediaForm(forms.Form):
 
 class MediaInfosForm(forms.Form):
     name = forms.CharField(max_length=100, required=True)
-    desc = forms.TextArea(max_length=1000000, required=False)
+    desc = forms.CharField(max_length=1000000, required=False)
 
 
 class UploadListingForm(forms.Form):
