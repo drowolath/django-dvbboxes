@@ -100,28 +100,6 @@ Rechercher un fichier
 	        </ul>
 	      </span>
 	      <input type="text" class="form-control" id="datetimepicker1" name="date"/>
-	      <span class="input-group-btn">
-	        <button type="button" class="btn btn-success dropdown-toggle"
-		        data-toggle="dropdown" id="dropdownAction">
-	          <span class="glyphicon glyphicon-cog"></span> <span class="caret"></span>
-	        </button>
-	        <ul class="dropdown-menu" aria-labelledby="dropdownAction">
-	          <li>
-		    <a href="#" data-value="check">
-		      <input type="radio" name="action" value="check" />
-		      &nbsp;Vérifier le programme
-		    </a>
-		    <a href="#" data-value="display">
-		      <input type="radio" name="action" value="display" />
-		      &nbsp;Voir le programme
-		    </a>
-		    <a href="#" data-value="delete">
-		      <input type="radio" name="action" value="delete" />
-		      &nbsp;Supprimer le programme
-		    </a>
-	          </li>
-	        </ul>
-	      </span>
               <span class="input-group-btn">
 	        <button type="button" class="btn btn-primary dropdown-toggle"
 			data-toggle="dropdown" id="dropdownService">
@@ -673,6 +651,12 @@ $( event.target ).blur();
 console.log( options );
 return false;
 });
+$(function () {
+  $('#datetimepicker1').datetimepicker({
+    locale: 'fr',
+    format: 'DDMMYYYY'
+    });
+  });
 </script>
 {% if not user.username %}
 <script type="text/javascript">$('#login').modal('show');</script>
