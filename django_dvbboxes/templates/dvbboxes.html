@@ -664,7 +664,7 @@ Rechercher un fichier
 	      method="POST"
 	      action="{% url 'django_dvbboxes:applylisting' %}">{% csrf_token %}
 	  <div class="input-group" style="width:340px;margin:0 auto;">
-	      <input type="hidden" name="parsed_data" value="{{ result }}">
+	      <input type="hidden" name="parsed_data" value="{{ json_result }}">
 	      <span class="input-group-btn">
 	        <button type="button" class="btn dropdown-toggle" id="dropdownTown"
 		        data-toggle="dropdown">
