@@ -341,11 +341,11 @@ Rechercher un fichier
         <form>
 	  <div class="form-group">
 	    <label for="name">Titre:</label>
-	    <input class="form-control" name="name" value="{{ filename }}"/>
+	    <input class="form-control" name="name" value="{{ db.name }}"/>
 	  </div>
 	  <div class="form-group">
 	    <label for="desc">Synopsis:</label>
-	    <textarea class="form-control" rows="6" name="desc"></textarea>
+	    <textarea class="form-control" rows="6" name="desc">{{ db.desc }}</textarea>
 	  </div>
 	  <div class="form-group">
 	    <button class="btn btn-primary" type="submit">Sauvegarder</button>

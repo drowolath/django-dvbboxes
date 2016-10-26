@@ -4,15 +4,13 @@ import collections
 import dvbboxes
 import json
 import os
-import shlex
 import string
-import subprocess
 import xmltodict
 from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from . import forms, models
 
 TOWNS = dvbboxes.TOWNS
@@ -342,6 +340,16 @@ def media(request, **kwargs):
         town = kwargs.get('town', '')
         context['town'] = town
         answer = {}
+        try:
+            mediaobject = models.Media.objects.get(filename=filename)
+        except models.Media.DoesNotExist:
+            mediaobject = models.Media(
+                name=createtitle(filename),
+                filename=filename,
+                desc=''
+                )
+            mediaobject.save()
+        context['db'] = mediaobject
         result = dvbboxes.Media(filename)
         duration = result.duration
         towns = list(result.towns)
