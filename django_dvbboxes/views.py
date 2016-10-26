@@ -484,10 +484,15 @@ def program(request, **kwargs):
         program = dvbboxes.Program(date, service_id)
         infos = program.infos(towns)
         result = collections.OrderedDict()
+        parsed_data = {'day': date}
         for _, start in infos:
             filename, index = _.split(':')
             media = dvbboxes.Media(filename)
             duration = media.duration
+            parsed_data[str(start)+'_'+index] = {
+                'filename': filename,
+                'duration': duration
+                }
             missing_towns = [i for i in towns if i not in media.towns]
             result[index] = [
                 datetime.fromtimestamp(start).strftime('%H:%M:%S'),
@@ -496,6 +501,10 @@ def program(request, **kwargs):
                 ', '.join(missing_towns),
                 duration
                 ]
+        xmlfile = '{0}_{1}.xml'.format(service_id, date)
+        if xmlfile not in os.listdir(settings.XMLTV):
+            buildxml([parsed_data], service_id)
         context['result'] = result
         context['date'] = date
+        context['channel'] = CHANNELS[service_id]
         return render(request, 'dvbboxes.html', context)
