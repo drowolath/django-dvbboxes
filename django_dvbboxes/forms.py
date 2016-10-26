@@ -13,7 +13,7 @@ for i in sorted(dvbboxes.CHANNELS):
 class SearchMediaForm(forms.Form):
     """search for media name in towns"""
     expression = forms.CharField(max_length=100, required=True)
-    town = forms.MultipleChoiceField(choices=TOWNS, required=False)
+    towns = forms.MultipleChoiceField(choices=TOWNS, required=False)
 
 
 class UploadListingForm(forms.Form):
@@ -23,7 +23,13 @@ class UploadListingForm(forms.Form):
 
 class ApplyListingForm(forms.Form):
     parsed_data = forms.CharField(max_length=1024000, required=True)
-    town = forms.MultipleChoiceField(choices=TOWNS, required=False)
+    towns = forms.MultipleChoiceField(choices=TOWNS, required=False)
+    service_id = forms.ChoiceField(choices=CHANNELS, required=True)
+
+
+class ProgramForm(forms.Form):
+    towns = forms.MultipleChoiceField(choices=TOWNS, required=False)
+    date = forms.DateField(required=True)
     service_id = forms.ChoiceField(choices=CHANNELS, required=True)
 
 

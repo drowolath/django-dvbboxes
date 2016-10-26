@@ -531,7 +531,7 @@ Rechercher un fichier
     </div>
   </div>
 </div>
-{% elif action == "program" %}
+{% elif action == "program_display" %}
 <div class="modal fade" id="resultModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -540,73 +540,15 @@ Rechercher un fichier
 		data-dismiss="modal" aria-label="Close">
 	  <span aria-hidden="true">&times;</span>
 	</button>
-	<h4 class="modal-title" id="myModalLabel">Guide des programmes</h4>
+	<h4 class="modal-title" id="myModalLabel">Programme du {{ date }}</h4>
       </div>
       <div class="modal-body">
-	<form class="col-lg-12"
-	      role="form"
-	      method="POST"
-	      action=".">{% csrf_token %}
-	  <div class="input-group" style="width:340px;margin:0 auto;">
-	      <span class="input-group-btn">
-	        <button type="button" class="btn dropdown-toggle" id="dropdownTown"
-		        data-toggle="dropdown">
-	          <span class="glyphicon glyphicon-tasks"></span> <span class="caret"></span>
-	        </button>
-	        <ul class="dropdown-menu" aria-labelledby="dropdownTown">
-	        {% for town in all_towns %}
-	          <li>
-	            <a href="#" data-value="{{ town }}">
-		      <input type="checkbox" value="{{ town }}" name="towns"/>
-		      &nbsp;{{ town|capfirst }}
-		    </a>
-	          </li>
-	        {% endfor %}
-	        </ul>
-	      </span>
-	      <input type="text" class="form-control" id="datetimepicker1" name="date"/>
-	      <span class="input-group-btn">
-	        <button type="button" class="btn btn-success dropdown-toggle"
-		        data-toggle="dropdown" id="dropdownAction">
-	          <span class="glyphicon glyphicon-cog"></span> <span class="caret"></span>
-	        </button>
-	        <ul class="dropdown-menu" aria-labelledby="dropdownAction">
-	          <li>
-		    <a href="#" data-value="check">
-		      <input type="radio" name="action" value="check" />
-		      &nbsp;Vérifier le programme
-		    </a>
-		    <a href="#" data-value="display">
-		      <input type="radio" name="action" value="display" />
-		      &nbsp;Voir le programme
-		    </a>
-		    <a href="#" data-value="delete">
-		      <input type="radio" name="action" value="delete" />
-		      &nbsp;Supprimer le programme
-		    </a>
-	          </li>
-	        </ul>
-	      </span>
-              <span class="input-group-btn">
-	        <button type="button" class="btn btn-primary dropdown-toggle"
-			data-toggle="dropdown" id="dropdownService">
-		  <span class="glyphicon glyphicon-folder-open"></span> <span class="caret"></span>
-		 </button>
-		 <ul class="dropdown-menu" aria-labelledby="dropdownService">
-		   <li>
-		   {% for service_id, names in all_channels.items %}
-		     <a href="#" data-value="{{ service_id }}">
-		       <input type="radio" name="service_id" value="{{ service_id }}" />
-		       &nbsp;{{ names|join:", " }}
-		     </a>
-		   {% endfor %}
-	           </li>
-	         </ul>
-	       </span>
-	      <button class="btn btn-small btn-primary" type="submit">Go!</button>
-	    </span>
-	  </div>
-	</form>
+        {% for index, data in result.items %}
+          {% if not data.4 %}<b>{% endif %}
+	  {{ data.0 }} - {{ data.1 }}: {{ data.2 }} {% if data.3 %}({{ data.3 }}){% endif %}
+          {% if not data.4 %}<b>{% endif %}
+          <br><br>
+        {% endfor %}
       </div>
       <div class="modal-footer">
 	<button type="button" class="btn btn-default"
@@ -745,14 +687,27 @@ return false;
     valueNames: ['moviename']
   };
   var tsfilesList = new List('tsfiles', options);
-  {% elif view == "program" %}
+  {% endif %}
   $(function () {
     $('#datetimepicker1').datetimepicker({
       locale: 'fr',
       format: 'DDMMYYYY'
       });
     });
-  {% endif %}
+</script>
+{% elif action == "program" %}
+<script>
+  $('#epgModal').modal('show');
+  $('#epgModal').on('hidden.bs.modal', function (e) {
+    window.location.href = "{% url 'django_dvbboxes:index' %}";
+  });
+</script>
+{% elif action == "listing" %}
+<script>
+  $('#listingModal').modal('show');
+  $('#listingModal').on('hidden.bs.modal', function (e) {
+    window.location.href = "{% url 'django_dvbboxes:index' %}";
+  });
 </script>
 {% endif %}
 {% endblock %}

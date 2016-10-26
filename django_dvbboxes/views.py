@@ -318,12 +318,24 @@ def media(request, **kwargs):
             if form.is_valid():
                 expression = form.cleaned_data['expression']
                 expression = expression.lower().replace(' ', '_')
+                expression = expression.rstrip('.ts')
                 towns = request.POST.getlist('towns')
                 towns.sort()
                 if not towns:
                     towns = TOWNS
                 context['towns'] = towns
                 answer = dvbboxes.Media.search(expression, towns)
+                for filename in answer:
+                    try:
+                        models.Media.objects.get(filename=filename)
+                    except models.Media.DoesNotExist:
+                        # the file exists in the cluster but not in db
+                        mediaobject = models.Media(
+                            name=createtitle(filename),
+                            filename=filename,
+                            desc=''
+                            )
+                        mediaobject.save()
                 context['answer'] = sorted(
                     [i.rstrip('.ts') for i in answer]
                     )
@@ -368,7 +380,8 @@ def listing(request, **kwargs):
         'actions': ['listing_parse', 'listing_apply'],
         }
     if request.method == 'GET':
-        return redirect('index')
+        context['action'] = 'listing'
+        return render(request, 'dvbboxes.html', context)
     elif request.method == 'POST':
         if 'listing/apply' in request.path:
             context['action'] = 'listing_apply'
@@ -447,54 +460,42 @@ def listing(request, **kwargs):
 
 @login_required
 def program(request, **kwargs):
-    """view for gettings programs"""
+    """view for managing programs"""
     context = {
         'view': 'program',
         'all_channels': CHANNELS,
         'all_towns': TOWNS,
         'method': request.method,
-        'actions': ['program', 'showresult'],
+        'actions': ['program_display'],
         }
     if request.method == 'GET':
-        context['action'] = 'program'
+        context['action'] = ['program']
         return render(request, 'dvbboxes.html', context)
     elif request.method == 'POST':
-        towns = request.POST.getlist('towns')
+        context['action'] = 'program_display'
+        form = forms.ProgramForm(request.POST)
+        form.is_valid()
+        towns = form.cleaned_data['towns']
+        if not towns:
+            towns = TOWNS
         towns.sort()
-        date = request.POST['date']
-        action = request.POST['action']
-        service_id = request.POST['service_id']
-        data = {
-            'delete': False,
-            'check': False,
-            'service_id': service_id,
-            }
-        context['action'] = 'showresult'
-        answer = []
-        if action in data:
-            data[action] = True
-        if towns == TOWNS or not towns:
-            dvbboxes_program = dvbboxes._program(date, town=None, **data)
-            for server, data in dvbboxes_program.items():
-                answer.append({
-                    'name': server.split('.')[0].replace('-', '_'),
-                    'id': server.split('.')[0].replace('-', ''),
-                    'server': server,
-                    'data': data['data'] or {
-                        service_id: "HTTP {}".format(data['status'])
-                        }
-                    })
-        else:
-            for town in towns:
-                dvbboxes_program = dvbboxes._program(date, town=town, **data)
-                for server, data in dvbboxes_program.items():
-                    answer.append({
-                        'name': server.split('.')[0].replace('-', '_'),
-                        'id': server.split('.')[0].replace('-', ''),
-                        'server': server,
-                        'data': data['data'] or {
-                            service_id: "HTTP {}".format(data['status'])
-                            }
-                        })
-        context['answer'] = answer
+        date = form.cleaned_data['date']
+        service_id = form.cleaned_data['service_id']
+        program = dvbboxes.Program(date, service_id)
+        infos = program.infos(towns)
+        result = collections.OrderedDict()
+        for _, start in infos:
+            filename, index = _.split(':')
+            media = dvbboxes.Media(filename)
+            duration = media.duration
+            missing_towns = [i for i in towns if i not in media.towns]
+            result[index] = [
+                datetime.fromtimestamp(start).strftime('%H:%M:%S'),
+                datetime.fromtimestamp(start+duration).strftime('%H:%M:%S'),
+                filename.rstrip('.ts'),
+                ', '.join(missing_towns),
+                duration
+                ]
+        context['result'] = result
+        context['date'] = date
         return render(request, 'dvbboxes.html', context)
