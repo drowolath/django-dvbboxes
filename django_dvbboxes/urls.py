@@ -34,5 +34,6 @@ urlpatterns = [
     url(r'listing/$', views.listing, name='listing'),
     # views.program urls
     url(r'program/$', views.program, name='program'),
+    url(r'program/xmltv/(?P<filename>\w+)/$', views.program, name='xmltv'),
     url(r'^$', views.index, name='index'),
     ]

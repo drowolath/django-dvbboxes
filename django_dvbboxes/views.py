@@ -501,10 +501,11 @@ def program(request, **kwargs):
                 ', '.join(missing_towns),
                 duration
                 ]
-        xmlfile = '{0}_{1}.xml'.format(service_id, date)
-        if xmlfile not in os.listdir(settings.XMLTV):
+        xmlfile = '{0}_{1}'.format(service_id, date)
+        if xmlfile+'.xml' not in os.listdir(settings.XMLTV):
             buildxml([parsed_data], service_id)
         context['result'] = result
         context['date'] = date
-        context['channel'] = CHANNELS[service_id]
+        context['xmlfile'] = xmlfile
+        context['channel'] = CHANNELS[int(service_id)]
         return render(request, 'dvbboxes.html', context)

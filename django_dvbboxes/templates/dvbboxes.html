@@ -518,14 +518,17 @@ Rechercher un fichier
 		data-dismiss="modal" aria-label="Close">
 	  <span aria-hidden="true">&times;</span>
 	</button>
-	<h4 class="modal-title" id="myModalLabel">Programme du {{ date }}</h4>
+	<h4 class="modal-title" id="myModalLabel">Programme du {{ date }} sur {{ channel }}</h4>
+	<a href="{% url 'django_dvbboxes:xmltv' filename=xmlfile %}">
+	  Télécharger le fichier XMLTV
+	</a>
       </div>
       <div class="modal-body">
         {% for index, data in result.items %}
           {% if not data.4 %}<b>{% endif %}
 	  {{ data.0 }} - {{ data.1 }}: {{ data.2 }} {% if data.3 %}({{ data.3 }}){% endif %}
           {% if not data.4 %}<b>{% endif %}
-          <br><br>
+          <br>
         {% endfor %}
       </div>
       <div class="modal-footer">
