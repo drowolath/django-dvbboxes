@@ -155,6 +155,7 @@ def index(request):
         'view': 'index',
         'all_channels': CHANNELS,
         'all_towns': TOWNS,
+        'cluster': dvbboxes.CLUSTER,
         }
     return render(request, 'dvbboxes.html', context)
 
