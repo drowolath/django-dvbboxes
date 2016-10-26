@@ -404,7 +404,7 @@ Rechercher un fichier
 	  <span aria-hidden="true">&times;</span>
 	</button>
 	<h4 class="modal-title" id="myModalLabel">Programme du {{ date }} sur {{ channel }}</h4>
-	<a href="{% url 'django_dvbboxes:xmltv' filename=xmlfile %}">
+	<a href="/xmltv/{{ xmlfile }}.xml">
 	  Télécharger le fichier XMLTV
 	</a>
       </div>
