@@ -274,7 +274,7 @@ Rechercher un fichier
 	    {% for filename in answer %}
  	      <li>
                 <a class="moviename"
-                   href="{% url 'django_dvbboxes:media_infos_' filename=filename %}">
+                   href="{% url 'django_dvbboxes:media_infos' filename=filename %}">
 		  {{ filename }}
                 </a>
               </li>
@@ -373,7 +373,7 @@ Rechercher un fichier
       </div>
       <div class="modal-body">
         <form method="POST"
-              action="{% url 'django_dvbboxes:media_infos_' filename=filename%}">{% csrf_token %}
+              action="{% url 'django_dvbboxes:media_infos' filename=filename%}">{% csrf_token %}
 	  <div class="form-group">
 	    <label for="name">Titre:</label>
 	    <input class="form-control" name="name" value="{{ db.name }}"/>

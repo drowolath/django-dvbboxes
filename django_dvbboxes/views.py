@@ -185,7 +185,8 @@ def media(request, **kwargs):
                                    server=server,
                                    name=filename)
                         subprocess.Popen(shlex.split(cmd))
-                return redirect('django_dvbboxes:media_info', filename=filename)
+                return redirect('django_dvbboxes:media_infos',
+                                filename=filename)
             else:
                 form = forms.DeleteBatchMediaForm(request.POST)
                 form.is_valid()
@@ -225,7 +226,8 @@ def media(request, **kwargs):
                                new_name=new_name
                                )
                     subprocess.Popen(shlex.split(cmd))
-            return redirect('django_dvbboxes:media_info', filename=new_name.rstrip('.ts'))
+            return redirect('django_dvbboxes:media_infos',
+                            filename=new_name.rstrip('.ts'))
     elif 'media/search' in request.path:
         if request.method == 'GET':
             return redirect('django_dvbboxes:index')
