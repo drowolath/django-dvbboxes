@@ -658,9 +658,8 @@ Rechercher un fichier
 	    </div>
 	  </div>
 	{% endfor %}
-	<br><br>
-        <p>Appliquez votre listing en choisissant une ville et une chaine</p>
-	<div>
+      </div>
+      <div class="modal-footer">
 	<form class="col-lg-12"
 	      role="form"
 	      method="POST"
@@ -683,16 +682,16 @@ Rechercher un fichier
 	        </ul>
 	      </span>
               <span class="input-group-btn">
-	        <button type="button" class="btn btn-primary dropdown-toggle"
+	        <button type="button" class="btn dropdown-toggle"
 			data-toggle="dropdown" id="dropdownService">
 		  <span class="glyphicon glyphicon-folder-open"></span> <span class="caret"></span>
 		 </button>
 		 <ul class="dropdown-menu" aria-labelledby="dropdownService">
 		   <li>
-		   {% for service_id, names in all_channels.items %}
+		   {% for service_id, name in all_channels.items %}
 		     <a href="#" data-value="{{ service_id }}">
 		       <input type="radio" name="service_id" value="{{ service_id }}" />
-		       &nbsp;{{ names|join:", " }}
+		       &nbsp;{{ name }}
 		     </a>
 		   {% endfor %}
 	           </li>
@@ -702,13 +701,6 @@ Rechercher un fichier
 	    </span>
 	  </div>
 	</form>
-        </div>
-      </div>
-      <div class="modal-footer">
-	<button type="button" class="btn btn-default"
-		data-dismiss="modal">
-	  Retour
-	</button>
       </div>
     </div>
   </div>
