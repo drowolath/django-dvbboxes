@@ -335,6 +335,7 @@ def media(request, **kwargs):
                     )
                 return render(request, 'dvbboxes.html', context)
     else:
+        filename += '.ts'
         context['action'] = 'media_display'
         # display filename informations
         town = kwargs.get('town', '')
