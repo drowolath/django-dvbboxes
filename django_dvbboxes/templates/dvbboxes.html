@@ -221,6 +221,115 @@ Rechercher un fichier
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+	<button type="button" class="close"
+		data-dismiss="modal" aria-label="Close">
+	  <span aria-hidden="true">&times;</span>
+	</button>
+	<h4 class="modal-title" id="myModalLabel">
+	  Fournissez une liste de fichiers à supprimer
+	</h4>
+        </h4>
+      </div>
+      <div class="modal-body">
+	<form class="col-lg-12"
+	      role="form"
+	      method="POST"
+	      action="{% url 'django_dvbboxes:media_delete_batch' %}"
+              enctype="multipart/form-data">{% csrf_token %}
+	  <div class="input-group" style="width:340px;margin:0 auto;">
+	    <span class="input-group-btn">
+	      <button type="button" class="btn btn-small dropdown-toggle"
+		      data-toggle="dropdown">
+		<span class="glyphicon glyphicon-tasks"></span> <span class="caret"></span>
+	      </button>
+	      <ul class="dropdown-menu">
+		{% for town in all_towns %}
+		  <li>
+		    <a href="#" data-value="{{ town }}">
+		      <input type="checkbox" value="{{ town }}" name="towns"/>
+		      &nbsp;{{ town|capfirst }}
+		    </a>
+		  </li>
+		{% endfor %}
+	      </ul>
+	    </span>
+	    <label class="btn" for="my-file-selector">
+	      <input id="my-file-selector" type="file" style="display:none;"
+		     onchange="$('#upload-file-info').html($(this).val());">
+	      Parcourir...
+	    </label>
+	    <span class="label label-info" id="upload-file-info"></span>
+	    <span class="input-group-btn">
+	      <button class="btn btn-small btn-primary" type="submit">Go!</button>
+	    </span>
+	  </div>
+	</form>
+      </div>
+      <div class="modal-footer">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">Retour</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="renamemediaModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+	<button type="button" class="close"
+		data-dismiss="modal" aria-label="Close">
+	  <span aria-hidden="true">&times;</span>
+	</button>
+	<h4 class="modal-title" id="myModalLabel">Saisissez un nouveau nom</h4>
+      </div>
+      <div class="modal-body">
+	<form class="col-lg-12"
+	      role="form"
+	      method="POST"
+	      action="{% url 'django_dvbboxes:media_rename' %}"
+              enctype="multipart/form-data">{% csrf_token %}
+	  <div class="input-group" style="width:340px;margin:0 auto;">
+	    <span class="input-group-btn">
+	      <button type="button" class="btn btn-small dropdown-toggle"
+		      data-toggle="dropdown">
+		<span class="glyphicon glyphicon-tasks"></span> <span class="caret"></span>
+	      </button>
+	      <ul class="dropdown-menu">
+		{% for town in all_towns %}
+		  <li>
+		    <a href="#" data-value="{{ town }}">
+		      <input type="checkbox" value="{{ town }}" name="towns"/>
+		      &nbsp;{{ town|capfirst }}
+		    </a>
+		  </li>
+		{% endfor %}
+	      </ul>
+	    </span>
+	    <label class="btn" for="my-file-selector">
+	      <input id="my-file-selector" type="file" style="display:none;"
+		     onchange="$('#upload-file-info').html($(this).val());">
+	      Parcourir...
+	    </label>
+	    <span class="label label-info" id="upload-file-info"></span>
+	    <span class="input-group-btn">
+	      <button class="btn btn-small btn-primary" type="submit">Go!</button>
+	    </span>
+	  </div>
+	</form>
+      </div>
+      <div class="modal-footer">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">Retour</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% if not user.username %}
 <div class="modal fade" role="dialog"
      aria-labelledby="loginLabel"
@@ -302,12 +411,6 @@ Rechercher un fichier
 	</button>
 	<h4 class="modal-title"
 	    id="myModalLabel">{{ filename }}</h4>
-	<a href="{% url 'django_dvbboxes:media_rename_' filename=filename %}">
-	  Renommer
-	</a>|
-	<a href="{% url 'django_dvbboxes:media_delete_' filename=filename %}">
-	  Supprimer
-	</a>
 	<br>
 	{% if not town %}
 	Villes: {{ answer.towns|join:", " }}
@@ -338,6 +441,46 @@ Rechercher un fichier
 	    </div>
 	  </div>
 	{% endif %}
+	<button class="btn btn-default" type="button" data-toggle="collapse"
+	        data-target="#rename" aria-expanded="false"
+		aria-controls="rename">
+	    Renommer
+	</button><br><br>
+	<div class="collapse" id="rename">
+	  <div class="well">
+	    <form class="col-lg-12"
+	          role="form"
+	          method="POST"
+	          action="{% url 'django_dvbboxes:media_rename' filename=filename town=town %}"
+	          >{% csrf_token %}
+	      <div class="input-group" style="width:340px;margin:0 auto;">
+	        <input type="text" class="form-control input-lg" name="name"
+		       placeholder="Nouveau nom">
+	        <button class="btn btn-lg btn-primary" type="submit">OK</button>
+	      </div>
+	    </form>
+	  </div>
+	</div>
+	<button class="btn btn-danger" type="button" data-toggle="collapse"
+		data-target="#delete" aria-expanded="false"
+		  aria-controls="delete">
+	    Supprimer
+	</button><br><br>
+	<div class="collapse" id="delete">
+	  <div class="well">
+	    <form class="col-lg-12"
+	        role="form"
+	        method="POST"
+	        action="{% url 'django_dvbboxes:media_delete' filename=filename %}"
+                >{% csrf_token %}
+	      <div class="input-group" style="width:340px;margin:0 auto;">
+	        <button class="btn btn-lg btn-danger" type="submit">Supprimer</button>
+	      </div>
+	    </form>
+	  </div>
+	</div>
+      </div>
+      <div class="modal-body">
         <form method="POST"
               action="{% url 'django_dvbboxes:media_infos_' filename=filename%}">{% csrf_token %}
 	  <div class="form-group">
@@ -356,156 +499,6 @@ Rechercher un fichier
       <div class="modal-footer">
 	<button type="button"
 		class="btn btn-default" data-dismiss="modal">Retour</button>
-      </div>
-    </div>
-  </div>
-</div>
-{% elif action == "media_rename" %}
-<div class="modal fade" id="resultModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-	<button type="button" class="close"
-		data-dismiss="modal" aria-label="Close">
-	  <span aria-hidden="true">&times;</span>
-	</button>
-	<h4 class="modal-title" id="myModalLabel">Renommer {{ filename }}</h4>
-      </div>
-      <div class="modal-body">
-	<form class="col-lg-12"
-	      role="form"
-	      method="POST"
-	      {% if not town %}
-	        action="{% url 'django_dvbboxes:media_rename_' filename=filename %}"
-	      {% else %}
-	        action="{% url 'django_dvbboxes:media_rename' filename=filename town=town %}"
-              {% endif %}
-	      >{% csrf_token %}
-	  <div class="input-group" style="width:340px;margin:0 auto;">
-	    <input type="text" class="form-control input-lg" name="expression"
-		   placeholder="Nouveau nom">
-	    <span class="input-group-btn">
-	      {% if not town %}
-	        <button type="button" class="btn btn-lg dropdown-toggle" data-toggle="dropdown">
-		  <span class="glyphicon glyphicon-tasks"></span> <span class="caret"></span>
-	        </button>
-	        <ul class="dropdown-menu">
-		  {% for town in all_towns %}
-		    <li>
-		      <a href="#" data-value="{{ town }}">
-		        <input type="checkbox" value="{{ town }}" name="towns"/>
-			&nbsp;{{ town|capfirst }}
-		      </a>
-		    </li>
-		  {% endfor %}
-	        </ul>
-              {% endif %} 
-	      <button class="btn btn-lg btn-primary" type="submit">OK</button>
-	    </span>
-	  </div>
-	</form>
-      </div>
-      <div class="modal-footer">
-	<button type="button" class="btn btn-default"
-		data-dismiss="modal">Retour</button>
-      </div>
-    </div>
-  </div>
-</div>
-{% elif action == "media_delete" %}
-<div class="modal fade" id="resultModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-	<button type="button" class="close"
-		data-dismiss="modal" aria-label="Close">
-	  <span aria-hidden="true">&times;</span>
-	</button>
-	<h4 class="modal-title" id="myModalLabel">
-	  {% if not filename and not town %}
-            Fournissez une liste de fichiers à supprimer
-          {% elif filename and town %}
-            Supprimer {{ filename }} à {{ town|capfirst }}
-          {% else %}
-            Supprimer {{ filename }}
-          {% endif %}
-        </h4>
-      </div>
-      <div class="modal-body">
-	{% if method == "GET" %}<!--we display forms-->
-	  <form class="col-lg-12"
-	        role="form"
-	        method="POST"
-		{% if filename and town %}
-		  action="{% url 'django_dvbboxes:media_delete' filename=filename town=town %}"
-	        {% elif filename %}
-	          action="{% url 'django_dvbboxes:media_delete_' filename=filename %}"
-	        {% else %}
-	          action="{% url 'django_dvbboxes:media_delete_batch' %}"
-                {% endif %}
-		{% if upload %}
-                  enctype="multipart/form-data"
-                {% endif %}
-	        >{% csrf_token %}
-	    <div class="input-group" style="width:340px;margin:0 auto;">
-	      {% if not filename and not town %}
-	        <span class="input-group-btn">
-	          <button type="button" class="btn btn-small dropdown-toggle"
-			  data-toggle="dropdown">
-		    <span class="glyphicon glyphicon-tasks"></span> <span class="caret"></span>
-	          </button>
-	          <ul class="dropdown-menu">
-		    {% for town in all_towns %}
-		      <li>
-		        <a href="#" data-value="{{ town }}">
-		          <input type="checkbox" value="{{ town }}" name="towns"/>
-			  &nbsp;{{ town|capfirst }}
-		        </a>
-		      </li>
-		    {% endfor %}
-	          </ul>
-		</span>
-		<label class="btn" for="my-file-selector">
-		  <input id="my-file-selector" type="file" style="display:none;"
-			 onchange="$('#upload-file-info').html($(this).val());">
-		  Parcourir...
-		</label>
-		<span class='label label-info' id="upload-file-info"></span>
-		<span class="input-group-btn">
-		  <button class="btn btn-small btn-primary" type="submit">Go!</button>
-		</span>
-	      {% elif filename and town %}
-	        <button class="btn btn-lg btn-danger" type="submit">Supprimer</button>
-              {% else %}	
-	        <button type="button" class="btn btn-lg dropdown-toggle" data-toggle="dropdown">
-		  <span class="glyphicon glyphicon-tasks"></span> <span class="caret"></span>
-	        </button>
-	        <ul class="dropdown-menu">
-		  {% for town in all_towns %}
-		    <li>
-		      <a href="#" data-value="{{ town }}">
-		        <input type="checkbox" value="{{ town }}" name="towns"/>
-		        &nbsp;{{ town|capfirst }}
-		      </a>
-		    </li>
-		  {% endfor %}
-	        </ul>
-		<button class="btn btn-lg btn-danger" type="submit">Supprimer</button>
-	      {% endif %}
-	    </div>
-	  </form>
-	{% elif method == "POST" %}
-          {% for line, data in answer.items %}
-            <h6>{{ line }}<h6>
-            {% for server, response in data.items %}
-	      <p>{{ server }}: {{ response }}</p>
-            {% endfor %}
-          {% endfor %}
-        {% endif %}
-      </div>
-      <div class="modal-footer">
-	<button type="button" class="btn btn-default"
-		data-dismiss="modal">Retour</button>
       </div>
     </div>
   </div>
@@ -676,26 +669,6 @@ $(function () {
   };
   var tsfilesList = new List('tsfiles', options);
   {% endif %}
-  $(function () {
-    $('#datetimepicker1').datetimepicker({
-      locale: 'fr',
-      format: 'DDMMYYYY'
-      });
-    });
-</script>
-{% elif action == "program" %}
-<script>
-  $('#epgModal').modal('show');
-  $('#epgModal').on('hidden.bs.modal', function (e) {
-    window.location.href = "{% url 'django_dvbboxes:index' %}";
-  });
-</script>
-{% elif action == "listing" %}
-<script>
-  $('#listingModal').modal('show');
-  $('#listingModal').on('hidden.bs.modal', function (e) {
-    window.location.href = "{% url 'django_dvbboxes:index' %}";
-  });
 </script>
 {% endif %}
 {% endblock %}

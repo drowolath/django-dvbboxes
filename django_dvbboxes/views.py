@@ -4,13 +4,14 @@ import collections
 import dvbboxes
 import json
 import os
+import shlex
 import string
+import subprocess
 import xmltodict
 from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import redirect, render
 from . import forms, models
 
 TOWNS = dvbboxes.TOWNS
@@ -162,152 +163,74 @@ def index(request):
 def media(request, **kwargs):
     """view for managing media files throughout the cluster"""
     filename = kwargs.get('filename', '')
-    town = kwargs.get('town', '')
     context = {
         'view': 'media',
         'all_towns': TOWNS,
         'method': request.method,
         'filename': filename,
-        'town': town,
         'actions': [
             'media_search',
             'media_display',
-            'media_rename',
-            'media_delete'
             ],
         }
-    if 'delete' in request.path:
-        context['action'] = 'media_delete'
-        if request.method == 'GET':
-            # If no filename's provided nor towns,
-            # the form will be an UploadFileForm (POST media_delete).
-            # If no town is provided, it will ask to choose a town
-            # (POST media_delete filename=x)
-            # If both filename and town are provided it'll ask confirmation.
-            # Confirmation issues a POST.
-            if not filename and not town:
-                context['upload'] = True
-            return render(request, 'dvbboxes.html', context)
-        elif request.method == 'POST':
-            if not filename and not town:
-                form = forms.UploadFileForm(request.POST)
-                if form.is_valid():
-                    filepath = handle_uploaded_file(request.FILES['file'])
-                    towns = form.cleaned_data['towns']
-                    if towns.sort() == TOWNS:
-                        towns = None
-                    context['towns'] = towns
-                    answer = {}
-                    # for each entry in the file, issue a delete to each town
-                    with open(filepath) as infile:
-                        for line in infile:
-                            line = line.replace('\n', '')
-                            answer[line] = {}
-                            if not towns:
-                                result = dvbboxes._media(
-                                    line, town=None, delete=True
-                                    )
-                                for info in result:
-                                    server, response = info
-                                    response = response.json()['result']
-                                    answer[line][server.fqdn] = response
-                            else:
-                                for town in towns:
-                                    result = dvbboxes._media(
-                                        line, town=town, delete=True
-                                        )
-                                    for info in result:
-                                        server, response = info
-                                        response = response.json()['result']
-                                        answer[line][server.fqdn] = response
-                    context['answer'] = answer
-                    return render(request, 'dvbboxes.html', context)
-            elif filename and town:
-                if town not in TOWNS:
-                    raise Http404(
-                        "There is no dvbbox instance in {}".format(town)
-                        )
-                else:
-                    answer = {filename: {}}
-                    result = dvbboxes._media(
-                        filename, town=town, delete=True
-                        )
-                    for info in result:
-                        server, response = info
-                        response = response.json()
-                        answer[filename][server.fqdn] = response['result']
-                    context['answer'] = answer
-                    return render(request, 'dvbboxes.html', context)
-            elif filename and not town:
-                form = forms.ChooseTownForm(request.POST)
-                if form.is_valid():
-                    towns = form.cleaned_data['towns']
-                    if towns.sort() == TOWNS:
-                        towns = None
-                    context['towns'] = towns
-                    answer = {filename: {}}
-                    if not towns:
-                        result = dvbboxes._media(
-                            line, town=None, delete=True
-                            )
-                        for info in result:
-                            server, response = info
-                            response = response.json()
-                            answer[filename][server.fqdn] = response['result']
-                    else:
-                        for town in towns:
-                            result = dvbboxes._media(
-                                line, town=town, delete=True
-                                )
-                            for info in result:
-                                server, response = info
-                                response = response.json()['result']
-                                answer[filename][server.fqdn] = response
-                    context['answer'] = answer
-                    return render(request, 'dvbboxes.html', context)
-            else:
-                raise Http404("this ressource does not exist")
-    elif 'media/rename' in request.path:
-        context['action'] = 'media_rename'
-        if request.method == 'GET':
-            if not filename:
-                raise Http404("this ressource does not exist")
-            else:
-                return render(request, 'dvbboxes.html', context)
-        elif request.method == 'POST':
-            form = forms.StandardForm(request.POST)
-            if form.is_valid():
-                expression = form.cleaned_data['expression']
-                expression = expression.lower().replace(' ', '_')
-                if not town:
-                    towns = form.cleaned_data['towns']
-                    if towns.sort() == TOWNS:
-                        towns = None
-                    context['towns'] = towns
-                    if not towns:
-                        result = dvbboxes._media(
-                            filename,
-                            town=None,
-                            rename=expression)
-                    else:
-                        for town in towns:
-                            result = dvbboxes._media(
-                                filename,
-                                town=town,
-                                rename=expression
-                                )
-                else:
-                    result = dvbboxes._media(
-                        filename,
-                        town=town,
-                        rename=expression
-                        )
-                return redirect('media', filename=expression)
-    elif 'media/search' in request.path:
-        context['action'] = 'media_search'
+    if 'media/delete' in request.path:
         if request.method == 'GET':
             return redirect('index')
         elif request.method == 'POST':
+            if filename:
+                for _, servers in dvbboxes.CLUSTER.items():
+                    for server in servers:
+                        cmd = ("ssh {server} dvbbox media {name} "
+                               "--delete").format(
+                                   server=server,
+                                   name=filename)
+                        subprocess.Popen(shlex.split(cmd))
+                return redirect('media_info', filename=filename)
+            else:
+                form = forms.DeleteBatchMediaForm(request.POST)
+                form.is_valid()
+                filepath = handle_uploaded_file(request.FILES['file'])
+                towns = form.cleaned_data['towns']
+                if not towns:
+                    towns = TOWNS
+                towns.sort()
+                with open(filepath) as infile:
+                    for line in infile:
+                        line = line.replace('\n', '')
+                        if line:
+                            for town in towns:
+                                for server in dvbboxes.CLUSTER[town]:
+                                    cmd = ("ssh {server} dvbbox media {name} "
+                                           "--delete").format(
+                                               server=server,
+                                               name=line)
+                                    subprocess.Popen(shlex.split(cmd))
+                return redirect('index')
+    elif 'media/rename' in request.path:
+        if request.method == 'GET':
+            return redirect('index')
+        elif request.method == 'POST':
+            form = forms.RenameMediaForm(request.POST)
+            form.is_valid()
+            new_name = form.cleaned_data['name']
+            new_name = new_name.lower().replace(' ', '_')
+            if not new_name.endswith('.ts'):
+                new_name += '.ts'
+            for _, servers in dvbboxes.CLUSTER.items():
+                for server in servers:
+                    cmd = ("ssh {server} dvbbox media {name} "
+                           "--rename {new_name}").format(
+                               server=server,
+                               name=filename,
+                               new_name=new_name
+                               )
+                    subprocess.Popen(shlex.split(cmd))
+            return redirect('media_info', filename=new_name.rstrip('.ts'))
+    elif 'media/search' in request.path:
+        if request.method == 'GET':
+            return redirect('index')
+        elif request.method == 'POST':
+            context['action'] = 'media_search'
             form = forms.SearchMediaForm(request.POST)
             if form.is_valid():
                 expression = form.cleaned_data['expression']
@@ -338,8 +261,6 @@ def media(request, **kwargs):
         filename += '.ts'
         context['action'] = 'media_display'
         # display filename informations
-        town = kwargs.get('town', '')
-        context['town'] = town
         answer = {}
         try:
             mediaobject = models.Media.objects.get(filename=filename)
@@ -401,8 +322,7 @@ def listing(request, **kwargs):
         'actions': ['listing_parse', 'listing_apply'],
         }
     if request.method == 'GET':
-        context['action'] = 'listing'
-        return render(request, 'dvbboxes.html', context)
+        return redirect('index')
     elif request.method == 'POST':
         if 'listing/apply' in request.path:
             context['action'] = 'listing_apply'
@@ -490,8 +410,7 @@ def program(request, **kwargs):
         'actions': ['program_display'],
         }
     if request.method == 'GET':
-        context['action'] = ['program']
-        return render(request, 'dvbboxes.html', context)
+        return redirect('index')
     elif request.method == 'POST':
         context['action'] = 'program_display'
         form = forms.ProgramForm(request.POST)

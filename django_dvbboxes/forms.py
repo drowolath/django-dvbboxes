@@ -21,6 +21,15 @@ class MediaInfosForm(forms.Form):
     desc = forms.CharField(max_length=1000000, required=False)
 
 
+class RenameMediaForm(forms.Form):
+    name = forms.CharField(max_length=100, required=True)
+
+
+class DeleteMediaForm(forms.Form):
+    file = forms.FileField(required=True)
+    towns = forms.MultipleChoiceField(choices=TOWNS, required=False)
+
+
 class UploadListingForm(forms.Form):
     """uploading a listing"""
     file = forms.FileField(required=True)
