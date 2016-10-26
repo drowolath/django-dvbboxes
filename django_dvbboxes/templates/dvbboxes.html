@@ -342,7 +342,7 @@ Rechercher un fichier
 	    <form class="col-lg-12"
 	          role="form"
 	          method="POST"
-	          action="{% url 'django_dvbboxes:media_rename' filename=filename town=town %}"
+	          action="{% url 'django_dvbboxes:media_rename' filename=filename %}"
 	          >{% csrf_token %}
 	      <div class="input-group" style="width:340px;margin:0 auto;">
 	        <input type="text" class="form-control input-lg" name="name"
