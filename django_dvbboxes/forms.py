@@ -29,7 +29,7 @@ class ApplyListingForm(forms.Form):
 
 class ProgramForm(forms.Form):
     towns = forms.MultipleChoiceField(choices=TOWNS, required=False)
-    date = forms.DateField(required=True)
+    date = forms.CharField(required=True)
     service_id = forms.ChoiceField(choices=CHANNELS, required=True)
 
 
