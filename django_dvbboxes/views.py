@@ -180,38 +180,14 @@ def media(request, **kwargs):
         if request.method == 'GET':
             return redirect('django_dvbboxes:index')
         elif request.method == 'POST':
-            if filename:
-                for _, servers in dvbboxes.CLUSTER.items():
-                    for server in servers:
-                        cmd = ("ssh {server} dvbbox media {name} "
-                               "--delete").format(
-                                   server=server,
-                                   name=filename)
-                        subprocess.Popen(shlex.split(cmd))
-                return redirect('django_dvbboxes:index')
-            else:
-                form = forms.DeleteMediaForm(request.POST, request.FILES)
-                if form.is_valid():
-                    filepath = handle_uploaded_file(request.FILES['filename'])
-                    towns = form.cleaned_data['towns']
-                    if not towns:
-                        towns = TOWNS
-                    towns.sort()
-                    with open(filepath) as infile:
-                        for line in infile:
-                            line = line.replace('\n', '')
-                            if line:
-                                for town in towns:
-                                    for server in dvbboxes.CLUSTER[town]:
-                                        cmd = ("ssh {server} dvbbox media "
-                                               "{name} --delete").format(
-                                                   server=server,
-                                                   name=line)
-                                        subprocess.Popen(shlex.split(cmd))
-                    return redirect('django_dvbboxes:index')
-                else:
-                    context['errors'] = form.errors
-                    return render(request, 'dvbboxes.html', context)
+            for _, servers in dvbboxes.CLUSTER.items():
+                for server in servers:
+                    cmd = ("ssh {server} dvbbox media {name} "
+                           "--delete").format(
+                               server=server,
+                               name=filename)
+                    subprocess.Popen(shlex.split(cmd))
+            return redirect('django_dvbboxes:index')
     elif 'media/rename' in request.path:
         if request.method == 'GET':
             return redirect('django_dvbboxes:index')
