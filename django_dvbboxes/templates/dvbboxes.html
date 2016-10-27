@@ -73,6 +73,38 @@ Rechercher un fichier
 {% endblock %}
 
 {% block modals %}
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+	<button type="button" class="close"
+		data-dismiss="modal" aria-label="Close">
+	  <span aria-hidden="true">&times;</span>
+	</button>
+	<h4 class="modal-title" id="myModalLabel">Erreur(s)</h4>
+      </div>
+      <div class="modal-body">
+	<p>Une ou plusieurs erreurs sont survenues lors du traitement des données
+	  fournies via ce formulaire. Vérifiez bien que vous avez saisis toutes les
+	  valeurs nécessaires, et ce correctement. L'être humain est peut-être cousin
+	  de certains primates, mais ça ne vous donne aucun droit.
+	</p>
+	<p> Ceci dit les erreurs les plus fréquentes violent les principes suivants:
+	  <ul>
+	    <li>Les dates doivent respecter le format jjmmaaaa (ex: 01102016)</li>
+	    <li>Les fichiers de listing doivent être nommés "chaine_jourdebut_jourfin" (ex: 85_01102016_30102016)</li>
+	    <li>Les noms de fichier doivent être fournis avec une extension en .ts, quand il s'agit de toute autre opération qu'une recherche</li>
+	  </ul>
+	</p>
+      </div>
+      <div class="modal-footer">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">Retour</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade" id="sysModal" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -597,6 +629,13 @@ $(function () {
   };
   var tsfilesList = new List('tsfiles', options);
   {% endif %}
+</script>
+{% elif errors %}
+<script type="text/javascript">
+  $('#errorModal').modal('show');
+  $('#errorModal').on('hidden.bs.modal', function (e) {
+    window.location.href = "{% url 'django_dvbboxes:index' %}";
+  });
 </script>
 {% endif %}
 {% endblock %}

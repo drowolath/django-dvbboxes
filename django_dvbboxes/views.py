@@ -190,45 +190,51 @@ def media(request, **kwargs):
                                 filename=filename)
             else:
                 form = forms.DeleteBatchMediaForm(request.POST)
-                form.is_valid()
-                filepath = handle_uploaded_file(request.FILES['file'])
-                towns = form.cleaned_data['towns']
-                if not towns:
-                    towns = TOWNS
-                towns.sort()
-                with open(filepath) as infile:
-                    for line in infile:
-                        line = line.replace('\n', '')
-                        if line:
-                            for town in towns:
-                                for server in dvbboxes.CLUSTER[town]:
-                                    cmd = ("ssh {server} dvbbox media {name} "
-                                           "--delete").format(
-                                               server=server,
-                                               name=line)
-                                    subprocess.Popen(shlex.split(cmd))
-                return redirect('django_dvbboxes:index')
+                if form.is_valid():
+                    filepath = handle_uploaded_file(request.FILES['file'])
+                    towns = form.cleaned_data['towns']
+                    if not towns:
+                        towns = TOWNS
+                    towns.sort()
+                    with open(filepath) as infile:
+                        for line in infile:
+                            line = line.replace('\n', '')
+                            if line:
+                                for town in towns:
+                                    for server in dvbboxes.CLUSTER[town]:
+                                        cmd = ("ssh {server} dvbbox media "
+                                               "{name} --delete").format(
+                                                   server=server,
+                                                   name=line)
+                                        subprocess.Popen(shlex.split(cmd))
+                    return redirect('django_dvbboxes:index')
+                else:
+                    context['errors'] = form.errors
+                    return render(request, 'dvbboxes.html', context)
     elif 'media/rename' in request.path:
         if request.method == 'GET':
             return redirect('django_dvbboxes:index')
         elif request.method == 'POST':
             form = forms.RenameMediaForm(request.POST)
-            form.is_valid()
-            new_name = form.cleaned_data['name']
-            new_name = new_name.lower().replace(' ', '_')
-            if not new_name.endswith('.ts'):
-                new_name += '.ts'
-            for _, servers in dvbboxes.CLUSTER.items():
-                for server in servers:
-                    cmd = ("ssh {server} dvbbox media {name} "
-                           "--rename {new_name}").format(
-                               server=server,
-                               name=filename,
-                               new_name=new_name
-                               )
-                    subprocess.Popen(shlex.split(cmd))
-            return redirect('django_dvbboxes:media_infos',
-                            filename=new_name.rstrip('.ts'))
+            if form.is_valid():
+                new_name = form.cleaned_data['name']
+                new_name = new_name.lower().replace(' ', '_')
+                if not new_name.endswith('.ts'):
+                    new_name += '.ts'
+                for _, servers in dvbboxes.CLUSTER.items():
+                    for server in servers:
+                        cmd = ("ssh {server} dvbbox media {name} "
+                               "--rename {new_name}").format(
+                                   server=server,
+                                   name=filename,
+                                   new_name=new_name
+                                   )
+                        subprocess.Popen(shlex.split(cmd))
+                return redirect('django_dvbboxes:media_infos',
+                                filename=new_name.rstrip('.ts'))
+            else:
+                context['errors'] = form.errors
+                return render(request, 'dvbboxes.html', context)
     elif 'media/search' in request.path:
         if request.method == 'GET':
             return redirect('django_dvbboxes:index')
@@ -260,6 +266,9 @@ def media(request, **kwargs):
                     [i.rstrip('.ts') for i in answer]
                     )
                 return render(request, 'dvbboxes.html', context)
+            else:
+                context['errors'] = form.errors
+                return render(request, 'dvbboxes.html', context)
     else:
         filename += '.ts'
         context['action'] = 'media_display'
@@ -276,19 +285,23 @@ def media(request, **kwargs):
             mediaobject.save()
         if request.method == 'POST':
             form = forms.MediaInfosForm(request.POST)
-            form.is_valid()
-            name = form.cleaned_data['name']
-            desc = form.cleaned_data['desc']
-            sem = False
-            if name != mediaobject.name:
-                mediaobject.name = name
-                sem = True
-            if desc != mediaobject.desc:
-                mediaobject.desc = desc
-                sem = True
-            if sem:
-                mediaobject.save()
-            return redirect('django_dvbboxes:media_infos_', filename=filename)
+            if form.is_valid():
+                name = form.cleaned_data['name']
+                desc = form.cleaned_data['desc']
+                sem = False
+                if name != mediaobject.name:
+                    mediaobject.name = name
+                    sem = True
+                if desc != mediaobject.desc:
+                    mediaobject.desc = desc
+                    sem = True
+                if sem:
+                    mediaobject.save()
+                return redirect('django_dvbboxes:media_infos_',
+                                filename=filename)
+            else:
+                context['errors'] = form.errors
+                return render(request, 'dvbboxes.html', context)
         else:
             context['db'] = mediaobject
             result = dvbboxes.Media(filename)
@@ -330,76 +343,82 @@ def listing(request, **kwargs):
         if 'listing/apply' in request.path:
             context['action'] = 'listing_apply'
             form = forms.ApplyListingForm(request.POST)
-            form.is_valid()
-            parsed_data = json.loads(form.cleaned_data['parsed_data'])
-            service_id = form.cleaned_data['service_id']
-            towns = request.POST.getlist('towns')
-            towns.sort()
-            # apply listing to servers in towns
-            dvbboxes.Listing.apply(parsed_data, service_id, towns)
-            # create xml files
-            buildxml(parsed_data, service_id)
-            return redirect('django_dvbboxes:index')
+            if form.is_valid():
+                parsed_data = json.loads(form.cleaned_data['parsed_data'])
+                service_id = form.cleaned_data['service_id']
+                towns = request.POST.getlist('towns')
+                towns.sort()
+                # apply listing to servers in towns
+                dvbboxes.Listing.apply(parsed_data, service_id, towns)
+                # create xml files
+                buildxml(parsed_data, service_id)
+                return redirect('django_dvbboxes:index')
+            else:
+                context['errors'] = form.errors
+                return render(request, 'dvbboxes.html', context)
         else:
             context['action'] = 'listing_parse'
             form = forms.UploadListingForm(request.POST)
-            form.is_valid()
-            filepath = handle_uploaded_file(request.FILES['file'])
-            listing = dvbboxes.Listing(filepath)  # get listing object
-            days = sorted(
-                listing.days,
-                key=lambda x: datetime.strptime(x, '%d%m%Y')
-                )  # sort days in the listing
-            missing_files = [
-                i for i, j in listing.filenames.items() if not j
-                ]  # detect missing files in the listing
-            result = collections.OrderedDict()  # prepare final result
-            for day in days:
-                result[day] = []
-            parsed_listing = listing.parse()
-            json_result = []
-            for data in parsed_listing:
-                infos = collections.OrderedDict()
-                data = json.loads(data)
-                json_result.append(data)
-                day = data['day']
-                del data['day']
-                starts = sorted(data, key=lambda x: float(x.split('_')[1]))
-                absent_files = 0
-                for start in starts:
-                    t, i = start.split('_')
-                    start_litteral = datetime.fromtimestamp(
-                        float(t)).strftime('%H:%M:%S')
-                    stop_litteral = datetime.fromtimestamp(
-                        float(t)+data[start]['duration']).strftime(
-                            '%d-%m-%Y %H:%M:%S')
-                    absent = not data[start]['duration']
-                    if absent:
-                        absent_files += 1
-                    filename = data[start]['filename']
-                    infos[i] = [
-                        start_litteral, filename, absent
-                        ]
-                # we now define if the parsing is fine
-                limit = datetime.strptime(day, '%d%m%Y') + timedelta(1)
-                length_ok = (
-                    datetime.fromtimestamp(
-                        float(t)+data[start]['duration']) >= limit
-                    )
-                if not absent_files and length_ok:
-                    success = 0  # green
-                elif absent_files and length_ok:
-                    success = 1  # lightblue
-                elif not absent_files and not length_ok:
-                    success = 2  # orange
-                else:
-                    success = 3  # red
-                result[day] = [infos, success, stop_litteral]
-            context['days'] = days
-            context['missing_files'] = missing_files
-            context['result'] = result
-            context['json_result'] = json.dumps(json_result)
-            return render(request, 'dvbboxes.html', context)
+            if form.is_valid():
+                filepath = handle_uploaded_file(request.FILES['file'])
+                listing = dvbboxes.Listing(filepath)  # get listing object
+                days = sorted(
+                    listing.days,
+                    key=lambda x: datetime.strptime(x, '%d%m%Y')
+                    )  # sort days in the listing
+                missing_files = [
+                    i for i, j in listing.filenames.items() if not j
+                    ]  # detect missing files in the listing
+                result = collections.OrderedDict()  # prepare final result
+                for day in days:
+                    result[day] = []
+                parsed_listing = listing.parse()
+                json_result = []
+                for data in parsed_listing:
+                    infos = collections.OrderedDict()
+                    data = json.loads(data)
+                    json_result.append(data)
+                    day = data['day']
+                    del data['day']
+                    starts = sorted(data, key=lambda x: float(x.split('_')[1]))
+                    absent_files = 0
+                    for start in starts:
+                        t, i = start.split('_')
+                        start_litteral = datetime.fromtimestamp(
+                            float(t)).strftime('%H:%M:%S')
+                        stop_litteral = datetime.fromtimestamp(
+                            float(t)+data[start]['duration']).strftime(
+                                '%d-%m-%Y %H:%M:%S')
+                        absent = not data[start]['duration']
+                        if absent:
+                            absent_files += 1
+                        filename = data[start]['filename']
+                        infos[i] = [
+                            start_litteral, filename, absent
+                            ]
+                    # we now define if the parsing is fine
+                    limit = datetime.strptime(day, '%d%m%Y') + timedelta(1)
+                    length_ok = (
+                        datetime.fromtimestamp(
+                            float(t)+data[start]['duration']) >= limit
+                        )
+                    if not absent_files and length_ok:
+                        success = 0  # green
+                    elif absent_files and length_ok:
+                        success = 1  # lightblue
+                    elif not absent_files and not length_ok:
+                        success = 2  # orange
+                    else:
+                        success = 3  # red
+                    result[day] = [infos, success, stop_litteral]
+                context['days'] = days
+                context['missing_files'] = missing_files
+                context['result'] = result
+                context['json_result'] = json.dumps(json_result)
+                return render(request, 'dvbboxes.html', context)
+            else:
+                context['errors'] = form.errors
+                return render(request, 'dvbboxes.html', context)
 
 
 @login_required
@@ -417,38 +436,41 @@ def program(request, **kwargs):
     elif request.method == 'POST':
         context['action'] = 'program_display'
         form = forms.ProgramForm(request.POST)
-        form.is_valid()
-        towns = form.cleaned_data['towns']
-        if not towns:
-            towns = TOWNS
-        towns.sort()
-        date = form.cleaned_data['date']
-        service_id = form.cleaned_data['service_id']
-        program = dvbboxes.Program(date, service_id)
-        infos = program.infos(towns)
-        result = collections.OrderedDict()
-        parsed_data = {'day': date}
-        for _, start in infos:
-            filename, index = _.split(':')
-            media = dvbboxes.Media(filename)
-            duration = media.duration
-            parsed_data[str(start)+'_'+index] = {
-                'filename': filename,
-                'duration': duration
-                }
-            missing_towns = [i for i in towns if i not in media.towns]
-            result[index] = [
-                datetime.fromtimestamp(start).strftime('%H:%M:%S'),
-                datetime.fromtimestamp(start+duration).strftime('%H:%M:%S'),
-                filename.rstrip('.ts'),
-                ', '.join(missing_towns),
-                duration
-                ]
-        xmlfile = '{0}_{1}'.format(service_id, date)
-        if xmlfile+'.xml' not in os.listdir(settings.XMLTV):
-            buildxml([parsed_data], service_id)
-        context['result'] = result
-        context['date'] = date
-        context['xmlfile'] = xmlfile
-        context['channel'] = CHANNELS[int(service_id)]
-        return render(request, 'dvbboxes.html', context)
+        if form.is_valid():
+            towns = form.cleaned_data['towns']
+            if not towns:
+                towns = TOWNS
+            towns.sort()
+            date = form.cleaned_data['date']
+            service_id = form.cleaned_data['service_id']
+            program = dvbboxes.Program(date, service_id)
+            infos = program.infos(towns)
+            result = collections.OrderedDict()
+            parsed_data = {'day': date}
+            for _, start in infos:
+                filename, index = _.split(':')
+                media = dvbboxes.Media(filename)
+                duration = media.duration
+                parsed_data[str(start)+'_'+index] = {
+                    'filename': filename,
+                    'duration': duration
+                    }
+                missing_towns = [i for i in towns if i not in media.towns]
+                result[index] = [
+                    datetime.fromtimestamp(start).strftime('%H:%M:%S'),
+                    datetime.fromtimestamp(start+duration).strftime('%H:%M:%S'),
+                    filename.rstrip('.ts'),
+                    ', '.join(missing_towns),
+                    duration
+                    ]
+            xmlfile = '{0}_{1}'.format(service_id, date)
+            if xmlfile+'.xml' not in os.listdir(settings.XMLTV):
+                buildxml([parsed_data], service_id)
+            context['result'] = result
+            context['date'] = date
+            context['xmlfile'] = xmlfile
+            context['channel'] = CHANNELS[int(service_id)]
+            return render(request, 'dvbboxes.html', context)
+        else:
+            context['errors'] = form.errors
+            return render(request, 'dvbboxes.html', context)
