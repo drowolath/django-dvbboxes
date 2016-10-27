@@ -27,7 +27,7 @@ class RenameMediaForm(forms.Form):
 
 
 class DeleteMediaForm(forms.Form):
-    file = forms.FileField(required=True)
+    filename = forms.FileField(required=True)
     towns = forms.MultipleChoiceField(choices=TOWNS, required=False)
 
 
