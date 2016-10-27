@@ -361,7 +361,7 @@ def listing(request, **kwargs):
         else:
             context['action'] = 'listing_parse'
             form = forms.UploadListingForm(request.POST)
-            form.is_valid():
+            form.is_valid()
             filepath = handle_uploaded_file(request.FILES['filename'])
             listing = dvbboxes.Listing(filepath)  # get listing object
             days = sorted(
