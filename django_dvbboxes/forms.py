@@ -70,5 +70,5 @@ class ProgramForm(forms.Form):
             time.mktime(time.strptime(date, '%d%m%Y'))
             return date
         except (ValueError, AssertionError):
-            msg = "Please, make sure the date follows ddmmyyyy format"
+            msg = "{} est une date invalide".format(date)
             raise forms.ValidationError(msg)
