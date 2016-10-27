@@ -188,8 +188,7 @@ def media(request, **kwargs):
                                    server=server,
                                    name=filename)
                         subprocess.Popen(shlex.split(cmd))
-                return redirect('django_dvbboxes:media_infos',
-                                filename=filename)
+                return redirect('django_dvbboxes:index')
             else:
                 form = forms.DeleteBatchMediaForm(request.POST)
                 if form.is_valid():
