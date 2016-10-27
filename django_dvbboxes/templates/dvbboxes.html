@@ -412,17 +412,21 @@ Rechercher un fichier
 	  <span aria-hidden="true">&times;</span>
 	</button>
 	<h4 class="modal-title" id="myModalLabel">Programme du {{ date }} sur {{ channel }}</h4>
-	<a href="/static/xml/{{ xmlfile }}.xml">
-	  Télécharger le fichier XMLTV
-	</a>
+	{% if result %}
+	  <a href="/static/xml/{{ xmlfile }}.xml">Télécharger le fichier XMLTV</a>
+        {% endif %}
       </div>
       <div class="modal-body">
-        {% for index, data in result.items %}
-          {% if not data.4 %}<b>{% endif %}
-	  {{ data.0 }} - {{ data.1 }}: {{ data.2 }} {% if data.3 %}({{ data.3 }}){% endif %}
-          {% if not data.4 %}</b>{% endif %}
-          <br>
-        {% endfor %}
+	{% if result %}
+          {% for index, data in result.items %}
+            {% if not data.4 %}<b>{% endif %}
+	    {{ data.0 }} - {{ data.1 }}: {{ data.2 }} {% if data.3 %}({{ data.3 }}){% endif %}
+            {% if not data.4 %}</b>{% endif %}
+            <br>
+          {% endfor %}
+        {% else %}
+          Il n'y a pas de programme pour cette date
+        {% endif %}
       </div>
       <div class="modal-footer">
 	<button type="button" class="btn btn-default"
