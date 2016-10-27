@@ -35,18 +35,6 @@ class UploadListingForm(forms.Form):
     """uploading a listing"""
     file = forms.FileField(required=True)
 
-    def clean_file(self):
-        file = self.file
-        try:
-            # service_id, start, stop = file.split('_')
-            # service_id = int(service_id)
-            # start = datetime.strptime(start, '%d%m%Y')
-            # stop = datetime.strptime(stop, '%d%m%Y')
-            return file
-        except ValueError:
-            msg = "Incorrect filename"
-            raise forms.ValidationError(msg)
-
 
 class ApplyListingForm(forms.Form):
     parsed_data = forms.CharField(max_length=1024000, required=True)

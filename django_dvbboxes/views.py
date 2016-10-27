@@ -23,11 +23,19 @@ for i in sorted(dvbboxes.CHANNELS):
 
 
 def handle_uploaded_file(f):
-    path = os.path.join('', f.name)
-    with open(path, 'wb+') as destination:
-        for chunk in f.chunks():
-            destination.write(chunk)
-    return path
+    try:
+        service_id, start, stop = f.name.split('_')
+        service_id = int(service_id)
+        start = datetime.strptime(start, '%d%m%Y')
+        stop = datetime.strptime(stop, '%d%m%Y')
+    except ValueError as exc:
+        raise exc
+    else:
+        path = os.path.join('', f.name)
+        with open(path, 'wb+') as destination:
+            for chunk in f.chunks():
+                destination.write(chunk)
+        return path
 
 
 def build_tmira_datetime(dt):
@@ -362,7 +370,11 @@ def listing(request, **kwargs):
             form = forms.UploadListingForm(request.POST)
             if form.is_valid():
                 context['action'] = 'listing_parse'
-                filepath = handle_uploaded_file(request.FILES['file'])
+                try:
+                    filepath = handle_uploaded_file(request.FILES['file'])
+                except ValueError:
+                    context['errors'] = form.errors
+                    return render(request, 'dvbboxes.html', context)
                 listing = dvbboxes.Listing(filepath)  # get listing object
                 days = sorted(
                     listing.days,
