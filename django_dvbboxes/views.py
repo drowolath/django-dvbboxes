@@ -241,9 +241,9 @@ def media(request, **kwargs):
         if request.method == 'GET':
             return redirect('django_dvbboxes:index')
         elif request.method == 'POST':
-            context['action'] = 'media_search'
             form = forms.SearchMediaForm(request.POST)
             if form.is_valid():
+                context['action'] = 'media_search'
                 expression = form.cleaned_data['expression']
                 expression = expression.lower().replace(' ', '_')
                 expression = expression.rstrip('.ts')
@@ -273,7 +273,6 @@ def media(request, **kwargs):
                 return render(request, 'dvbboxes.html', context)
     else:
         filename += '.ts'
-        context['action'] = 'media_display'
         # display filename informations
         answer = {}
         try:
@@ -288,6 +287,7 @@ def media(request, **kwargs):
         if request.method == 'POST':
             form = forms.MediaInfosForm(request.POST)
             if form.is_valid():
+                context['action'] = 'media_display'
                 name = form.cleaned_data['name']
                 desc = form.cleaned_data['desc']
                 sem = False
@@ -343,9 +343,9 @@ def listing(request, **kwargs):
         return redirect('django_dvbboxes:index')
     elif request.method == 'POST':
         if 'listing/apply' in request.path:
-            context['action'] = 'listing_apply'
             form = forms.ApplyListingForm(request.POST)
             if form.is_valid():
+                context['action'] = 'listing_apply'
                 parsed_data = json.loads(form.cleaned_data['parsed_data'])
                 service_id = form.cleaned_data['service_id']
                 towns = request.POST.getlist('towns')
@@ -359,9 +359,9 @@ def listing(request, **kwargs):
                 context['errors'] = form.errors
                 return render(request, 'dvbboxes.html', context)
         else:
-            context['action'] = 'listing_parse'
             form = forms.UploadListingForm(request.POST)
             if form.is_valid():
+                context['action'] = 'listing_parse'
                 filepath = handle_uploaded_file(request.FILES['file'])
                 listing = dvbboxes.Listing(filepath)  # get listing object
                 days = sorted(
