@@ -274,7 +274,7 @@ def media(request, **kwargs):
                     sem = True
                 if sem:
                     mediaobject.save()
-                return redirect('django_dvbboxes:media_infos_',
+                return redirect('django_dvbboxes:media_infos',
                                 filename=filename)
             else:
                 context['errors'] = form.errors
