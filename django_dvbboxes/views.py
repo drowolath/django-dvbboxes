@@ -361,66 +361,66 @@ def listing(request, **kwargs):
         else:
             context['action'] = 'listing_parse'
             form = forms.UploadListingForm(request.POST)
-            if form.is_valid():
-                filepath = handle_uploaded_file(request.FILES['filename'])
-                listing = dvbboxes.Listing(filepath)  # get listing object
-                days = sorted(
-                    listing.days,
-                    key=lambda x: datetime.strptime(x, '%d%m%Y')
-                    )  # sort days in the listing
-                missing_files = [
-                    i for i, j in listing.filenames.items() if not j
-                    ]  # detect missing files in the listing
-                result = collections.OrderedDict()  # prepare final result
-                for day in days:
-                    result[day] = []
-                parsed_listing = listing.parse()
-                json_result = []
-                for data in parsed_listing:
-                    infos = collections.OrderedDict()
-                    data = json.loads(data)
-                    json_result.append(data)
-                    day = data['day']
-                    del data['day']
-                    starts = sorted(data, key=lambda x: float(x.split('_')[1]))
-                    absent_files = 0
-                    for start in starts:
-                        t, i = start.split('_')
-                        start_litteral = datetime.fromtimestamp(
-                            float(t)).strftime('%H:%M:%S')
-                        stop_litteral = datetime.fromtimestamp(
-                            float(t)+data[start]['duration']).strftime(
-                                '%d-%m-%Y %H:%M:%S')
-                        absent = not data[start]['duration']
-                        if absent:
-                            absent_files += 1
-                        filename = data[start]['filename']
-                        infos[i] = [
-                            start_litteral, filename, absent
-                            ]
-                    # we now define if the parsing is fine
-                    limit = datetime.strptime(day, '%d%m%Y') + timedelta(1)
-                    length_ok = (
-                        datetime.fromtimestamp(
-                            float(t)+data[start]['duration']) >= limit
-                        )
-                    if not absent_files and length_ok:
-                        success = 0  # green
-                    elif absent_files and length_ok:
-                        success = 1  # lightblue
-                    elif not absent_files and not length_ok:
-                        success = 2  # orange
-                    else:
-                        success = 3  # red
-                    result[day] = [infos, success, stop_litteral]
-                context['days'] = days
-                context['missing_files'] = missing_files
-                context['result'] = result
-                context['json_result'] = json.dumps(json_result)
-                return render(request, 'dvbboxes.html', context)
-            else:
-                context['errors'] = form.errors
-                return render(request, 'dvbboxes.html', context)
+            form.is_valid():
+            filepath = handle_uploaded_file(request.FILES['filename'])
+            listing = dvbboxes.Listing(filepath)  # get listing object
+            days = sorted(
+                listing.days,
+                key=lambda x: datetime.strptime(x, '%d%m%Y')
+                )  # sort days in the listing
+            missing_files = [
+                i for i, j in listing.filenames.items() if not j
+                ]  # detect missing files in the listing
+            result = collections.OrderedDict()  # prepare final result
+            for day in days:
+                result[day] = []
+            parsed_listing = listing.parse()
+            json_result = []
+            for data in parsed_listing:
+                infos = collections.OrderedDict()
+                data = json.loads(data)
+                json_result.append(data)
+                day = data['day']
+                del data['day']
+                starts = sorted(data, key=lambda x: float(x.split('_')[1]))
+                absent_files = 0
+                for start in starts:
+                    t, i = start.split('_')
+                    start_litteral = datetime.fromtimestamp(
+                        float(t)).strftime('%H:%M:%S')
+                    stop_litteral = datetime.fromtimestamp(
+                        float(t)+data[start]['duration']).strftime(
+                            '%d-%m-%Y %H:%M:%S')
+                    absent = not data[start]['duration']
+                    if absent:
+                        absent_files += 1
+                    filename = data[start]['filename']
+                    infos[i] = [
+                        start_litteral, filename, absent
+                        ]
+                # we now define if the parsing is fine
+                limit = datetime.strptime(day, '%d%m%Y') + timedelta(1)
+                length_ok = (
+                    datetime.fromtimestamp(
+                        float(t)+data[start]['duration']) >= limit
+                    )
+                if not absent_files and length_ok:
+                    success = 0  # green
+                elif absent_files and length_ok:
+                    success = 1  # lightblue
+                elif not absent_files and not length_ok:
+                    success = 2  # orange
+                else:
+                    success = 3  # red
+                result[day] = [infos, success, stop_litteral]
+            context['days'] = days
+            context['missing_files'] = missing_files
+            context['result'] = result
+            context['json_result'] = json.dumps(json_result)
+            return render(request, 'dvbboxes.html', context)
+            # else:
+            #     context['errors'] = form.errors
+            #     return render(request, 'dvbboxes.html', context)
 
 
 @login_required
