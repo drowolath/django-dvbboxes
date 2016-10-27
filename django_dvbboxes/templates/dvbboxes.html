@@ -254,7 +254,7 @@ Rechercher un fichier
 	      role="form"
 	      method="POST"
 	      action="{% url 'django_dvbboxes:media_delete_batch' %}"
-              enctype="multipart/form-data">{% csrf_token %}
+	      enctype="multipart/form-data">{% csrf_token %}
 	  <div class="input-group" style="width:340px;margin:0 auto;">
 	    <span class="input-group-btn">
 	      <button type="button" class="btn btn-small dropdown-toggle"
@@ -277,7 +277,7 @@ Rechercher un fichier
 		     style="display:none;" name="filename"
 		     onchange="$('#upload-file-info').html($(this).val());"> Parcourir...
 	    </label>
-	    <span class='label label-info' id="upload-file-info"></span>
+	    <span class="label label-info" id="upload-file-info"></span>
 	    <span class="input-group-btn">
 	      <button class="btn btn-small btn-primary" type="submit">Go!</button>
 	    </span>
