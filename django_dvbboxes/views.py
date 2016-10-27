@@ -438,7 +438,6 @@ def program(request, **kwargs):
     elif request.method == 'POST':
         form = forms.ProgramForm(request.POST)
         if form.is_valid():
-            context['action'] = 'program_display'
             towns = form.cleaned_data['towns']
             if not towns:
                 towns = TOWNS
@@ -450,6 +449,7 @@ def program(request, **kwargs):
             except ValueError:
                 context['errors'] = "{} est une date incorrecte".format(date)
                 return render(request, 'dvbboxes.html', context)
+            context['action'] = 'program_display'
             infos = program.infos(towns)
             result = collections.OrderedDict()
             parsed_data = {'day': date}
