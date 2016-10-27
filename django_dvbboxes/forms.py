@@ -43,8 +43,10 @@ class UploadListingForm(forms.Form):
             datetime.strptime(start, '%d%m%Y')
             datetime.strptime(stop, '%d%m%Y')
             return filename
-        except (ValueError, AssertionError) as exc:
-            raise forms.ValidationError(exc.message)
+        except (ValueError, AssertionError):
+            msg = "'{}' est un nom de fichier invalide".format(
+                filename.name)
+            raise forms.ValidationError(msg)
 
 
 class ApplyListingForm(forms.Form):
