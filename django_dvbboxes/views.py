@@ -69,7 +69,7 @@ def createtitle(name):
 def buildxml(parsed_data, service_id):
     """create xml files for epg"""
     for data in parsed_data:
-        if data:
+        if data and len(data)>1:
             day = data['day']
             keys = [i for i in data if i!='day']
             keys = sorted(keys, key=lambda x: int(x.split('_')[1]))
