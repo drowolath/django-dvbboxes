@@ -437,6 +437,7 @@ def program(request, **kwargs):
         context['action'] = 'program_display'
         form = forms.ProgramForm(request.POST)
         if form.is_valid():
+            print bonobo
             towns = form.cleaned_data['towns']
             if not towns:
                 towns = TOWNS
