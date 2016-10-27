@@ -50,8 +50,9 @@ class ProgramForm(forms.Form):
     def clean_date(self):
         date = self.cleaned_data['date']
         try:
+            assert len(date) == 8
             datetime.strptime(date, '%d%m%Y')
             return date
-        except ValueError:
+        except (ValueError, AssertionError):
             msg = "Please, make sure the date follows ddmmyyyy format"
             raise forms.ValidationError(msg)
