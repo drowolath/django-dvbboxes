@@ -33,7 +33,7 @@ class DeleteMediaForm(forms.Form):
 
 class UploadListingForm(forms.Form):
     """uploading a listing"""
-    file = forms.FileField(required=True)
+    filename = forms.FileField(required=True)
 
 
 class ApplyListingForm(forms.Form):

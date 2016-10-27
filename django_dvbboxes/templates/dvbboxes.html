@@ -216,9 +216,9 @@ Rechercher un fichier
 	      action="{% url 'django_dvbboxes:listing' %}"
 	      enctype="multipart/form-data">{% csrf_token %}
 	  <div class="input-group" style="width:340px;margin:0 auto;">
-	    <label class="btn" for="my-file-selector">
-	      <input id="my-file-selector" type="file"
-		     style="display:none;" name="file"
+	    <label class="btn" for="filename">
+	      <input id="filename" type="file"
+		     style="display:none;" name="filename"
 		     onchange="$('#upload-file-info').html($(this).val());"> Parcourir...
 	    </label>
 	    <span class='label label-info' id="upload-file-info"></span>
