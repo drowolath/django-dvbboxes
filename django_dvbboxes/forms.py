@@ -42,7 +42,7 @@ class UploadListingForm(forms.Form):
             # service_id = int(service_id)
             # start = datetime.strptime(start, '%d%m%Y')
             # stop = datetime.strptime(stop, '%d%m%Y')
-            return file
+            return file.name
         except ValueError:
             msg = "Incorrect filename"
             raise forms.ValidationError(msg)
