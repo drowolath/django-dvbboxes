@@ -256,28 +256,28 @@ Rechercher un fichier
 	      action="{% url 'django_dvbboxes:media_delete_batch' %}"
 	      enctype="multipart/form-data">{% csrf_token %}
 	  <div class="input-group" style="width:340px;margin:0 auto;">
-	    <!-- <span class="input-group-btn"> -->
-	    <!--   <button type="button" class="btn btn-small dropdown-toggle" -->
-	    <!-- 	      data-toggle="dropdown"> -->
-	    <!-- 	<span class="glyphicon glyphicon-tasks"></span> <span class="caret"></span> -->
-	    <!--   </button> -->
-	    <!--   <ul class="dropdown-menu"> -->
-	    <!-- 	{% for town in all_towns %} -->
-	    <!-- 	  <li> -->
-	    <!-- 	    <a href="#" data-value="{{ town }}"> -->
-	    <!-- 	      <input type="checkbox" value="{{ town }}" name="towns"/> -->
-	    <!-- 	      &nbsp;{{ town|capfirst }} -->
-	    <!-- 	    </a> -->
-	    <!-- 	  </li> -->
-	    <!-- 	{% endfor %} -->
-	    <!--   </ul> -->
-	    <!-- </span> -->
+	    <span class="input-group-btn">
+	      <button type="button" class="btn btn-small dropdown-toggle"
+	    	      data-toggle="dropdown">
+	    	<span class="glyphicon glyphicon-tasks"></span> <span class="caret"></span>
+	      </button>
+	      <ul class="dropdown-menu">
+	    	{% for town in all_towns %}
+	    	  <li>
+	    	    <a href="#" data-value="{{ town }}">
+	    	      <input type="checkbox" value="{{ town }}" name="towns"/>
+	    	      &nbsp;{{ town|capfirst }}
+	    	    </a>
+	    	  </li>
+	    	{% endfor %}
+	      </ul>
+	    </span>
 	    <label class="btn" for="filename">
 	      <input id="filename" type="file"
 		     style="display:none;" name="filename"
-		     onchange="$('#upload-file-info').html($(this).val());"> Parcourir...
+		     onchange="$('#upload-deletefile-info').html($(this).val());"> Parcourir...
 	    </label>
-	    <span class="label label-info" id="upload-file-info"></span>
+	    <span class="label label-info" id="upload-deletefile-info"></span>
 	    <span class="input-group-btn">
 	      <button class="btn btn-small btn-primary" type="submit">Go!</button>
 	    </span>
