@@ -38,10 +38,11 @@ class UploadListingForm(forms.Form):
     def clean_filename(self):
         filename = self.cleaned_data['filename']
         try:
-            service_id, start, stop = filename.split('_')
+            service_id, start, stop = filename.name.split('_')
             assert service_id in dvbboxes.CHANNELS
             datetime.strptime(start, '%d%m%Y')
             datetime.strptime(stop, '%d%m%Y')
+            return filename
         except (ValueError, AssertionError) as exc:
             raise forms.ValidationError(exc.message)
 
