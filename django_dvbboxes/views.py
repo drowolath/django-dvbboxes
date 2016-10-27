@@ -192,7 +192,7 @@ def media(request, **kwargs):
             else:
                 form = forms.DeleteMediaForm(request.POST, request.FILES)
                 if form.is_valid():
-                    filepath = handle_uploaded_file(request.FILES['file'])
+                    filepath = handle_uploaded_file(request.FILES['filename'])
                     towns = form.cleaned_data['towns']
                     if not towns:
                         towns = TOWNS
