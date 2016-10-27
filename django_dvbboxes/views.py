@@ -146,6 +146,8 @@ def buildxml(parsed_data, service_id):
             )
         with open(xmlfile+'.xml', 'w') as f:
             f.write(xmltodict.unparse(xml))
+    cmd = "/usr/local/share/dvb/nemo/manage.py collectstatic --noinput"
+    subprocess.call(shlex.split(cmd))
 
 
 @login_required
