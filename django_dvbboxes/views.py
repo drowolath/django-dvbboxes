@@ -444,11 +444,7 @@ def program(request, **kwargs):
             towns.sort()
             date = form.cleaned_data['date']
             service_id = form.cleaned_data['service_id']
-            try:
-                program = dvbboxes.Program(date, service_id)
-            except ValueError:
-                context['errors'] = "{} est une date incorrecte".format(date)
-                return render(request, 'dvbboxes.html', context)
+            program = dvbboxes.Program(date, service_id)
             context['action'] = 'program_display'
             infos = program.infos(towns)
             result = collections.OrderedDict()

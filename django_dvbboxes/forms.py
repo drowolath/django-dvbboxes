@@ -1,4 +1,5 @@
 import dvbboxes
+import time
 from datetime import datetime
 from django import forms
 
@@ -40,8 +41,10 @@ class UploadListingForm(forms.Form):
         try:
             service_id, start, stop = filename.name.split('_')
             assert service_id in dvbboxes.CHANNELS
-            datetime.strptime(start, '%d%m%Y')
-            datetime.strptime(stop, '%d%m%Y')
+            assert len(start) == 8
+            assert len(stop) == 8
+            time.mktime(time.strptime(start, '%d%m%Y'))
+            time.mktime(time.strptime(stop, '%d%m%Y'))
             return filename
         except (ValueError, AssertionError):
             msg = "'{}' est un nom de fichier invalide".format(
@@ -64,7 +67,7 @@ class ProgramForm(forms.Form):
         date = self.cleaned_data['date']
         try:
             assert len(date) == 8
-            datetime.strptime(date, '%d%m%Y')
+            time.mktime(time.strptime(date, '%d%m%Y'))
             return date
         except (ValueError, AssertionError):
             msg = "Please, make sure the date follows ddmmyyyy format"
