@@ -434,10 +434,9 @@ def program(request, **kwargs):
     if request.method == 'GET':
         return redirect('django_dvbboxes:index')
     elif request.method == 'POST':
-        context['action'] = 'program_display'
         form = forms.ProgramForm(request.POST)
         if form.is_valid():
-            print bonobo
+            context['action'] = 'program_display'
             towns = form.cleaned_data['towns']
             if not towns:
                 towns = TOWNS
