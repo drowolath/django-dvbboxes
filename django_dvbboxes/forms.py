@@ -38,10 +38,10 @@ class UploadListingForm(forms.Form):
     def clean_file(self):
         file = self.cleaned_data['file']
         try:
-            service_id, start, stop = file.split('_')
-            service_id = int(service_id)
-            start = datetime.strptime(start, '%d%m%Y')
-            stop = datetime.strptime(stop, '%d%m%Y')
+            # service_id, start, stop = file.split('_')
+            # service_id = int(service_id)
+            # start = datetime.strptime(start, '%d%m%Y')
+            # stop = datetime.strptime(stop, '%d%m%Y')
             return file
         except ValueError:
             msg = "Incorrect filename"
