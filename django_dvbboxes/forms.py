@@ -45,25 +45,3 @@ class ProgramForm(forms.Form):
     towns = forms.MultipleChoiceField(choices=TOWNS, required=False)
     date = forms.CharField(required=True)
     service_id = forms.ChoiceField(choices=CHANNELS, required=True)
-
-
-class StandardForm(forms.Form):
-    """given text, apply proper action throughout cluster"""
-    expression = forms.CharField(max_length=100, required=True)
-    town = forms.MultipleChoiceField(choices=TOWNS, required=False)
-
-
-class UploadFileForm(forms.Form):
-    """uploading a file"""
-    file = forms.FileField(required=True)
-    town = forms.ChoiceField(choices=TOWNS, required=False)
-
-
-class ChooseTownForm(forms.Form):
-    """simply choose towns"""
-    town = forms.MultipleChoiceField(choices=TOWNS, required=True)
-
-
-class UploadForm(forms.Form):
-    """uploading a file"""
-    file = forms.FileField(required=True)

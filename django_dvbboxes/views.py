@@ -458,7 +458,8 @@ def program(request, **kwargs):
                 missing_towns = [i for i in towns if i not in media.towns]
                 result[index] = [
                     datetime.fromtimestamp(start).strftime('%H:%M:%S'),
-                    datetime.fromtimestamp(start+duration).strftime('%H:%M:%S'),
+                    datetime.fromtimestamp(
+                        start+duration).strftime('%H:%M:%S'),
                     filename.rstrip('.ts'),
                     ', '.join(missing_towns),
                     duration
