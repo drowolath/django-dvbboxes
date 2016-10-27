@@ -220,7 +220,7 @@ Rechercher un fichier
 	      action="{% url 'django_dvbboxes:media_check' %}"
 	      enctype="multipart/form-data">{% csrf_token %}
 	  <div class="input-group" style="width:340px;margin:0 auto;">
-	    <input id="input-1a" type="file" class="file" data-show-preview="false">
+	    <input id="input-la" name="filename" type="file" class="file" data-show-preview="false">
 	    <span class="input-group-btn">
 	      <button class="btn btn-small btn-primary" type="submit">Go!</button>
 	    </span>
