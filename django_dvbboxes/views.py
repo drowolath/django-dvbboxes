@@ -360,7 +360,7 @@ def listing(request, **kwargs):
                 return render(request, 'dvbboxes.html', context)
         else:
             context['action'] = 'listing_parse'
-            form = forms.UploadListingForm(request.POST)
+            form = forms.UploadListingForm(request.POST, request.FILES)
             if form.is_valid():
                 filepath = handle_uploaded_file(request.FILES['filename'])
                 listing = dvbboxes.Listing(filepath)  # get listing object
