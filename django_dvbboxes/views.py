@@ -418,9 +418,9 @@ def listing(request, **kwargs):
                 context['result'] = result
                 context['json_result'] = json.dumps(json_result)
                 return render(request, 'dvbboxes.html', context)
-            # else:
-            #     context['errors'] = form.errors
-            #     return render(request, 'dvbboxes.html', context)
+            else:
+                context['errors'] = form.errors
+                return render(request, 'dvbboxes.html', context)
 
 
 @login_required
