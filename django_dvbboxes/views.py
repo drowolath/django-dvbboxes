@@ -275,7 +275,7 @@ def media(request, **kwargs):
                 if sem:
                     mediaobject.save()
                 return redirect('django_dvbboxes:media_infos',
-                                filename=filename)
+                                filename=filename.rstrip('.ts'))
             else:
                 context['errors'] = form.errors
                 return render(request, 'dvbboxes.html', context)
