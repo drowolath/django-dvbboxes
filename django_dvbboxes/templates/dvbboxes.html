@@ -321,10 +321,14 @@ Rechercher un fichier
 	  <ul class="list">
 	    {% for filename, towns in result.items %}
  	      <li>
-                <a class="moviename"
-                   href="{% url 'django_dvbboxes:media_infos' filename=filename %}">
+	        {% if towns %}
+                  <a class="moviename"
+                     href="{% url 'django_dvbboxes:media_infos' filename=filename %}">
 		  {{ filename }}
-                </a> ({{ towns|join:", " }})
+                  </a> ({{ towns|join:", " }})
+                {% else %}
+                  {{ filename }} n'existe pas
+                {% endif %}
               </li>
 	    {% endfor %}
 	  </ul>
