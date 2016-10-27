@@ -1,6 +1,5 @@
 import dvbboxes
 import time
-from datetime import datetime
 from django import forms
 
 TOWNS = ()

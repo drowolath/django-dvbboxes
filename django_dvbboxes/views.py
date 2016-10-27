@@ -305,6 +305,7 @@ def media(request, **kwargs):
                 context['errors'] = form.errors
                 return render(request, 'dvbboxes.html', context)
         else:
+            context['action'] = 'media_display'
             context['db'] = mediaobject
             result = dvbboxes.Media(filename)
             duration = result.duration
