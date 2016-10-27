@@ -357,8 +357,8 @@ def listing(request, **kwargs):
                     data = json.loads(data)
                     json_result.append(data)
                     day = data['day']
-                    del data['day']
-                    starts = sorted(data, key=lambda x: float(x.split('_')[1]))
+                    starts = [i for i in data if i != 'day']
+                    starts = sorted(starts, key=lambda x: float(x.split('_')[1]))
                     absent_files = 0
                     for start in starts:
                         t, i = start.split('_')
