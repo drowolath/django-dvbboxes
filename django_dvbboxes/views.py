@@ -23,7 +23,7 @@ for i in sorted(dvbboxes.CHANNELS):
 
 
 def handle_uploaded_file(f):
-    path = os.path.join('', f.name)
+    path = os.path.join('/usr/local/share/dvb/nemo/uploads/', f.name)
     with open(path, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
