@@ -615,6 +615,11 @@ $(function () {
     valueNames: ['moviename']
   };
   var tsfilesList = new List('tsfiles', options);
+  {% elif action == "media_check" %}
+  var options = {
+    valueNames: ['moviename']
+  };
+  var tsfilesList = new List('tsfiles', options);
   {% endif %}
 </script>
 {% elif errors %}
