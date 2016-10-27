@@ -25,10 +25,10 @@ for i in sorted(dvbboxes.CHANNELS):
 def handle_uploaded_file(f):
     try:
         service_id, start, stop = f.name.split('_')
-        service_id = int(service_id)
+        assert service_id in dvbboxes.CHANNELS
         start = datetime.strptime(start, '%d%m%Y')
         stop = datetime.strptime(stop, '%d%m%Y')
-    except ValueError as exc:
+    except (ValueError, AssertionError) as exc:
         raise exc
     else:
         path = os.path.join('', f.name)
