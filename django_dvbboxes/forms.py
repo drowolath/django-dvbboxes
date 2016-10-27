@@ -35,6 +35,16 @@ class UploadListingForm(forms.Form):
     """uploading a listing"""
     filename = forms.FileField(required=True)
 
+    def clean_filename(self):
+        filename = self.cleaned_data['filename']
+        try:
+            service_id, start, stop = filename.split('_')
+            assert service_id in dvbboxes.CHANNELS
+            datetime.strptime(start, '%d%m%Y')
+            datetime.strptime(stop, '%d%m%Y')
+        except (ValueError, AssertionError) as exc:
+            raise forms.ValidationError(exc.message)
+
 
 class ApplyListingForm(forms.Form):
     parsed_data = forms.CharField(max_length=1024000, required=True)
