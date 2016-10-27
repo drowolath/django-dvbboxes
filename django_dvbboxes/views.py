@@ -231,7 +231,7 @@ def media(request, **kwargs):
                                    name=filename,
                                    new_name=new_name
                                    )
-                        subprocess.Popen(shlex.split(cmd))
+                        subprocess.call(shlex.split(cmd))
                 return redirect('django_dvbboxes:media_infos',
                                 filename=new_name.rstrip('.ts'))
             else:
