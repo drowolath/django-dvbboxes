@@ -256,22 +256,22 @@ Rechercher un fichier
 	      action="{% url 'django_dvbboxes:media_delete_batch' %}"
 	      enctype="multipart/form-data">{% csrf_token %}
 	  <div class="input-group" style="width:340px;margin:0 auto;">
-	    <span class="input-group-btn">
-	      <button type="button" class="btn btn-small dropdown-toggle"
-		      data-toggle="dropdown">
-		<span class="glyphicon glyphicon-tasks"></span> <span class="caret"></span>
-	      </button>
-	      <ul class="dropdown-menu">
-		{% for town in all_towns %}
-		  <li>
-		    <a href="#" data-value="{{ town }}">
-		      <input type="checkbox" value="{{ town }}" name="towns"/>
-		      &nbsp;{{ town|capfirst }}
-		    </a>
-		  </li>
-		{% endfor %}
-	      </ul>
-	    </span>
+	    <!-- <span class="input-group-btn"> -->
+	    <!--   <button type="button" class="btn btn-small dropdown-toggle" -->
+	    <!-- 	      data-toggle="dropdown"> -->
+	    <!-- 	<span class="glyphicon glyphicon-tasks"></span> <span class="caret"></span> -->
+	    <!--   </button> -->
+	    <!--   <ul class="dropdown-menu"> -->
+	    <!-- 	{% for town in all_towns %} -->
+	    <!-- 	  <li> -->
+	    <!-- 	    <a href="#" data-value="{{ town }}"> -->
+	    <!-- 	      <input type="checkbox" value="{{ town }}" name="towns"/> -->
+	    <!-- 	      &nbsp;{{ town|capfirst }} -->
+	    <!-- 	    </a> -->
+	    <!-- 	  </li> -->
+	    <!-- 	{% endfor %} -->
+	    <!--   </ul> -->
+	    <!-- </span> -->
 	    <label class="btn" for="filename">
 	      <input id="filename" type="file"
 		     style="display:none;" name="filename"
