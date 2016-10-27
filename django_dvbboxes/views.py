@@ -190,7 +190,7 @@ def media(request, **kwargs):
                         subprocess.Popen(shlex.split(cmd))
                 return redirect('django_dvbboxes:index')
             else:
-                form = forms.DeleteBatchMediaForm(request.POST)
+                form = forms.DeleteMediaForm(request.POST, request.FILES)
                 if form.is_valid():
                     filepath = handle_uploaded_file(request.FILES['file'])
                     towns = form.cleaned_data['towns']
