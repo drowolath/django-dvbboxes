@@ -177,6 +177,7 @@ def media(request, **kwargs):
         'actions': [
             'media_search',
             'media_display',
+            'media_check'
             ],
         }
     if 'media/delete' in request.path:
@@ -212,6 +213,24 @@ def media(request, **kwargs):
                         subprocess.call(shlex.split(cmd))
                 return redirect('django_dvbboxes:media_infos',
                                 filename=new_name.rstrip('.ts'))
+            else:
+                context['errors'] = form.errors
+                return render(request, 'dvbboxes.html', context)
+    elif 'media/check' in request.path:
+        if request.method == 'GET':
+            return redirect('django_dvbboxes:index')
+        elif request.method == 'POST':
+            form = forms.UploadMediaCheckForm(request.POST, request.FILES)
+            if form.is_valid():
+                context['action'] = 'media_check'
+                filepath = handle_uploaded_file(request.FILES['filename'])
+                result = {}
+                with open(filepath) as infile:
+                    for line in infile:
+                        line = line.replace('\n', '')
+                        result[line] = dvbboxes.Media(line).towns
+                context['result'] = result
+                return render(request, 'dvbboxes.html', context)
             else:
                 context['errors'] = form.errors
                 return render(request, 'dvbboxes.html', context)
