@@ -525,6 +525,47 @@ Rechercher un fichier
     </div>
   </div>
 </div>
+{% elif action == "listing_apply" %}
+<div class="modal fade" id="resultModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+	<button type="button" class="close"
+		data-dismiss="modal" aria-label="Close">
+	  <span aria-hidden="true">&times;</span>
+	</button>
+        <h4 class="modal-title" id="myModalLabel">Résultat de l'application de votre listing</h4>
+      </div>
+      <div class="modal-body">
+	{% for town, data in result.items %}
+	  {% for date, infos in data.items %}
+	    <button class="btn btn-default" type="button" data-toggle="collapse"
+	            data-target="#{{ date }}" aria-expanded="false"
+		aria-controls="{{ date }}"> {{ date }}</button><br><br>
+	    <div class="collapse" id="{{ town }}">
+	      <div class="well">
+	        {% for server, status in infos.items %}
+                  <h5>{{ server }}</h5>
+		  {% if not status.delete or not status.insert %}
+                    <p>L'application du listing n'a pas correctement fonctionné.</p>
+		    <p>Il va falloir recommencer si vous tenez à ce noeud.</p>
+                  {% else %}
+                    <p>OK</p>
+                  {% endif %}
+                {% endfor %}
+	      </div>
+	    </div>
+          {% endfor %}
+        {% endfor %}
+
+      </div>
+      <div class="modal-footer">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">Retour</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% endif %}
 {% endblock %}
 

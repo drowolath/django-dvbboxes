@@ -327,10 +327,11 @@ def listing(request, **kwargs):
                 towns = request.POST.getlist('towns')
                 towns.sort()
                 # apply listing to servers in towns
-                dvbboxes.Listing.apply(parsed_data, service_id, towns)
+                result = dvbboxes.Listing.apply(parsed_data, service_id, towns)
                 # create xml files
                 buildxml(parsed_data, service_id)
-                return redirect('django_dvbboxes:index')
+                context['result'] = result
+                return render(request, 'dvbboxes.html', context)
             else:
                 context['errors'] = form.errors
                 return render(request, 'dvbboxes.html', context)
