@@ -368,7 +368,7 @@ def listing(request, **kwargs):
                     result[day] = {}
                 for town, data in response.items():
                     for day, infos in data.items():
-                        for server, status in infos.items:
+                        for server, status in infos.items():
                             result[day][server] = status
                 context['result'] = result
                 return render(request, 'dvbboxes.html', context)
