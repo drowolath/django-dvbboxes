@@ -365,7 +365,7 @@ def listing(request, **kwargs):
                 # reorganize response by days
                 result = collections.OrderedDict()
                 for day in days:
-                    result[day] = {}
+                    result[day] = collections.OrderedDict()
                 bar = True
                 for town, data in response.items():
                     for day, infos in data.items():
