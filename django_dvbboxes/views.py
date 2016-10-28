@@ -346,12 +346,16 @@ def listing(request, **kwargs):
                 context['action'] = 'listing_apply'
                 parsed_data = json.loads(form.cleaned_data['parsed_data'])
                 service_id = form.cleaned_data['service_id']
-                towns = request.POST.getlist('towns')
+                towns = form.cleaned_data['towns']
+                if not towns:
+                    towns = TOWNS
                 towns.sort()
                 # apply listing to servers in towns
                 result = dvbboxes.Listing.apply(parsed_data, service_id, towns)
                 # create xml files
                 buildxml(parsed_data, service_id)
+                a = result['antananarivo']
+                print bonobo
                 context['result'] = result
                 return render(request, 'dvbboxes.html', context)
             else:
