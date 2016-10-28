@@ -381,13 +381,17 @@ def listing(request, **kwargs):
         else:
             form = forms.UploadListingForm(request.POST, request.FILES)
             if form.is_valid():
-                context['action'] = 'listing_parse'
                 filepath = handle_uploaded_file(request.FILES['filename'])
                 listing = dvbboxes.Listing(filepath)  # get listing object
                 days = sorted(
                     listing.days,
                     key=lambda x: datetime.strptime(x, '%d%m%Y')
                     )  # sort days in the listing
+                if len(days) > 31:
+                    context['errors'] = ("Impossible de traiter "
+                                         "plus de 31 jours")
+                    return render(request, 'dvbboxes.html', context)
+                context['action'] = 'listing_parse'
                 missing_files = [
                     i for i, j in listing.filenames.items() if not j
                     ]  # detect missing files in the listing
