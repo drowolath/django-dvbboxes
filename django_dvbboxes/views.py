@@ -7,6 +7,7 @@ import os
 import shlex
 import string
 import subprocess
+import time
 import xmltodict
 from datetime import datetime, timedelta
 from django.conf import settings
@@ -351,11 +352,24 @@ def listing(request, **kwargs):
                     towns = TOWNS
                 towns.sort()
                 # apply listing to servers in towns
-                result = dvbboxes.Listing.apply(parsed_data, service_id, towns)
+                days = [data['day'] for data in parsed_data]
+                days = sorted(
+                    days,
+                    key=lambda x: time.mktime(time.strptime(x, '%d%m%Y'))
+                    )
+                response = dvbboxes.Listing.apply(
+                    parsed_data, service_id, towns
+                    )
                 # create xml files
                 buildxml(parsed_data, service_id)
-                a = result['antananarivo']
-                print bonobo
+                # reorganize response by days
+                result = collections.OrderedDict()
+                for day in days:
+                    result[day] = {}
+                for town, data in response.items():
+                    for day, infos in data.items():
+                        for server, status in infos.items:
+                            result[day][server] = status
                 context['result'] = result
                 return render(request, 'dvbboxes.html', context)
             else:

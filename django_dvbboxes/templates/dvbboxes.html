@@ -585,19 +585,22 @@ Rechercher un fichier
         <h4 class="modal-title" id="myModalLabel">Résultat de l'application de votre listing</h4>
       </div>
       <div class="modal-body">
-	{% for town, data in result.items %}
-	  {% for date, infos in data.items %}
-	    <button class="btn btn-primary" type="button" data-toggle="collapse"
-	            data-target="#{{ date }}" aria-expanded="false"
-		    aria-controls="{{ date }}"> {{ date }}
-	    </button><br><br>
-	    <div class="collapse" id="{{ date }}">
+	{% for day, data in result.items %}
+          <button class="btn btn-primary" type="button" data-toggle="collapse"
+	          data-target="#{{ day }}" aria-expanded="false"
+		  aria-controls="{{ day }}"> {{ day }}</button><br><br>
+	    <div class="collapse" id="{{ day }}">
 	      <div class="well">
-		<ul>
-	          {% for server, status in infos.items %}
-                    <li>{{ server }}</li>
-                  {% endfor %}
-                </ul>
+                {% for server, status in data.items %}
+                  <h5>{{ server }}</h5>
+                  {% if not status.delete or not status.insert %}
+                    <p>L'application du listing <b>ne s'est pas bien passée</b>.
+                       Le contenu de la base de données sur ce serveur n'a pas été
+                       correctement mis à jour</p>
+                  {% else }
+                    <p>OK</p>
+                  {% endif %}<br><br>
+                {% endfor %}
 	      </div>
 	    </div>
           {% endfor %}
