@@ -84,12 +84,13 @@ Rechercher un fichier
       </div>
       <div class="modal-body">
 	<p>Une ou plusieurs erreurs sont survenues lors du traitement des données
-	  fournies via ce formulaire. Vérifiez bien que vous avez saisi toutes les
+	  fournies (via formulaire ou URL). Vérifiez bien que vous avez saisi toutes les
 	  valeurs nécessaires, et ce correctement. L'être humain est peut-être cousin
 	  de certains primates, mais ça ne vous donne aucun droit.
 	</p>
 	<p> Ceci dit les erreurs les plus fréquentes violent les principes suivants:
 	  <ul>
+            <li>les fichiers qui n'existent nulle part donnent cette page d'erreur</li>
 	    <li>les dates doivent respecter le format <b>jjmmaaaa</b> (ex: 01102016)</li>
 	    <li>les fichiers de listing doivent être nommés <b>"chaine_jourdebut_jourfin"</b> (ex: 85_01102016_30102016)</li>
 	    <li>les noms de fichier doivent être fournis avec une extension en .ts, quand il s'agit de toute autre opération qu'une recherche</li>
@@ -672,6 +673,20 @@ $(function () {
 <script type="text/javascript">
   $('#mediaModal').modal('show');
   $('#mediaModal').on('hidden.bs.modal', function (e) {
+    window.location.href = "{% url 'django_dvbboxes:index' %}";
+  });
+</script>
+{% elif action == "show_listingModal" %}
+<script type="text/javascript">
+  $('#listingModal').modal('show');
+  $('#listingModal').on('hidden.bs.modal', function (e) {
+    window.location.href = "{% url 'django_dvbboxes:index' %}";
+  });
+</script>
+{% elif action == "show_programModal" %}
+<script type="text/javascript">
+  $('#programModal').modal('show');
+  $('#programModal').on('hidden.bs.modal', function (e) {
     window.location.href = "{% url 'django_dvbboxes:index' %}";
   });
 </script>

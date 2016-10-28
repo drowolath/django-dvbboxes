@@ -274,8 +274,12 @@ def media(request, **kwargs):
                 return render(request, 'dvbboxes.html', context)
     else:
         filename += '.ts'
-        # display filename informations
-        answer = {}
+        media = dvbboxes.Media(filename)
+        duration = media.duration
+        if not duration:
+            # file does not exist in the cluster
+            context['errors'] = "Ce fichier n'existe nulle part"
+            return render(request, 'dvbboxes.html', context)
         try:
             mediaobject = models.Media.objects.get(filename=filename)
         except models.Media.DoesNotExist:
@@ -285,50 +289,50 @@ def media(request, **kwargs):
                 desc=''
                 )
             mediaobject.save()
-        if request.method == 'POST':
-            form = forms.MediaInfosForm(request.POST)
-            if form.is_valid():
-                context['action'] = 'media_display'
-                name = form.cleaned_data['name']
-                desc = form.cleaned_data['desc']
-                sem = False
-                if name != mediaobject.name:
-                    mediaobject.name = name
-                    sem = True
-                if desc != mediaobject.desc:
-                    mediaobject.desc = desc
-                    sem = True
-                if sem:
-                    mediaobject.save()
-                return redirect('django_dvbboxes:media_infos',
-                                filename=filename.rstrip('.ts'))
+        finally:
+            if request.method == 'POST':
+                form = forms.MediaInfosForm(request.POST)
+                if form.is_valid():
+                    context['action'] = 'media_display'
+                    name = form.cleaned_data['name']
+                    desc = form.cleaned_data['desc']
+                    sem = False
+                    if name != mediaobject.name:
+                        mediaobject.name = name
+                        sem = True
+                    if desc != mediaobject.desc:
+                        mediaobject.desc = desc
+                        sem = True
+                    if sem:
+                        mediaobject.save()
+                    return redirect('django_dvbboxes:media_infos',
+                                    filename=filename.rstrip('.ts'))
+                else:
+                    context['errors'] = form.errors
+                    return render(request, 'dvbboxes.html', context)
             else:
-                context['errors'] = form.errors
+                answer = {}
+                context['action'] = 'media_display'
+                context['db'] = mediaobject
+                towns = list(media.towns)
+                towns.sort()
+                answer['towns'] = towns
+                minutes, seconds = divmod(duration, 60)
+                hours, minutes = divmod(minutes, 60)
+                duration = "%02d:%02d:%02d\n" % (hours, minutes, seconds)
+                answer['duration'] = duration
+                schedule = {}
+                for service_id, timestamps in media.schedule.items():
+                    timestamps = sorted(list(timestamps))
+                    timestamps.sort()
+                    schedule[service_id] = [
+                        datetime.fromtimestamp(timestamp).strftime(
+                            dvbboxes.CONFIG.get('LOG', 'datefmt'))
+                        for timestamp in timestamps
+                        ]
+                answer['schedule'] = schedule
+                context['answer'] = answer
                 return render(request, 'dvbboxes.html', context)
-        else:
-            context['action'] = 'media_display'
-            context['db'] = mediaobject
-            result = dvbboxes.Media(filename)
-            duration = result.duration
-            towns = list(result.towns)
-            towns.sort()
-            answer['towns'] = towns or context['all_towns']
-            minutes, seconds = divmod(duration, 60)
-            hours, minutes = divmod(minutes, 60)
-            duration = "%02d:%02d:%02d\n" % (hours, minutes, seconds)
-            answer['duration'] = duration
-            schedule = {}
-            for service_id, timestamps in result.schedule.items():
-                timestamps = sorted(list(timestamps))
-                timestamps.sort()
-                schedule[service_id] = [
-                    datetime.fromtimestamp(timestamp).strftime(
-                        dvbboxes.CONFIG.get('LOG', 'datefmt'))
-                    for timestamp in timestamps
-                    ]
-            answer['schedule'] = schedule
-            context['answer'] = answer
-            return render(request, 'dvbboxes.html', context)
 
 
 @login_required
@@ -342,7 +346,8 @@ def listing(request, **kwargs):
         'actions': ['listing_parse', 'listing_apply'],
         }
     if request.method == 'GET':
-        return redirect('django_dvbboxes:index')
+        context['action'] = 'show_listingModal'
+        return render(request, 'dvbboxes.html', context)
     elif request.method == 'POST':
         if 'listing/apply' in request.path:
             form = forms.ApplyListingForm(request.POST)
@@ -463,7 +468,8 @@ def program(request, **kwargs):
         'actions': ['program_display'],
         }
     if request.method == 'GET':
-        return redirect('django_dvbboxes:index')
+        context['action'] = 'show_programModal'
+        return render(request, 'dvbboxes.html', context)
     elif request.method == 'POST':
         form = forms.ProgramForm(request.POST)
         if form.is_valid():
