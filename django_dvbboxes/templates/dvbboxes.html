@@ -668,5 +668,12 @@ $(function () {
     window.location.href = "{% url 'django_dvbboxes:index' %}";
   });
 </script>
+{% elif action == "show_mediaModal" %}
+<script type="text/javascript">
+  $('#mediaModal').modal('show');
+  $('#mediaModal').on('hidden.bs.modal', function (e) {
+    window.location.href = "{% url 'django_dvbboxes:index' %}";
+  });
+</script>
 {% endif %}
 {% endblock %}

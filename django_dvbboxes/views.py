@@ -183,7 +183,8 @@ def media(request, **kwargs):
         }
     if 'media/delete' in request.path:
         if request.method == 'GET':
-            return redirect('django_dvbboxes:index')
+            return redirect('django_dvbboxes:media_infos',
+                            filename=filename)
         elif request.method == 'POST':
             for _, servers in dvbboxes.CLUSTER.items():
                 for server in servers:
@@ -195,7 +196,8 @@ def media(request, **kwargs):
             return redirect('django_dvbboxes:index')
     elif 'media/rename' in request.path:
         if request.method == 'GET':
-            return redirect('django_dvbboxes:index')
+            return redirect('django_dvbboxes:media_infos',
+                            filename=filename)
         elif request.method == 'POST':
             form = forms.RenameMediaForm(request.POST)
             if form.is_valid():
@@ -219,7 +221,8 @@ def media(request, **kwargs):
                 return render(request, 'dvbboxes.html', context)
     elif 'media/check' in request.path:
         if request.method == 'GET':
-            return redirect('django_dvbboxes:index')
+            context['action'] = 'show_mediaModal'
+            return render(request, 'dvbboxes.html', context)
         elif request.method == 'POST':
             form = forms.UploadMediaCheckForm(request.POST, request.FILES)
             if form.is_valid():
