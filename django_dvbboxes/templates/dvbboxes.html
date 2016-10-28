@@ -593,11 +593,11 @@ Rechercher un fichier
 	    <div class="well">
               {% for server, status in data.items %}
                 <h5>{{ server }}</h5>
-                {% if not status.delete or not status.insert %}
+                {% if not status %}
                   <p>L'application du listing <b>ne s'est pas bien passée</b>.
                      Le contenu de la base de données sur ce serveur n'a pas été
                      correctement mis à jour</p>
-                {% else }
+                {% else %}
                   <p>OK</p>
                 {% endif %}<br><br>
               {% endfor %}

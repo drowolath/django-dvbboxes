@@ -366,10 +366,13 @@ def listing(request, **kwargs):
                 result = collections.OrderedDict()
                 for day in days:
                     result[day] = {}
+                bar = True
                 for town, data in response.items():
                     for day, infos in data.items():
-                        for server, status in infos.items():
-                            result[day][server] = status
+                        for server, statuses in infos.items():
+                            foo = all(statuses.values())
+                            result[day][server] = foo
+                            bar = bar and foo
                 context['result'] = result
                 return render(request, 'dvbboxes.html', context)
             else:
