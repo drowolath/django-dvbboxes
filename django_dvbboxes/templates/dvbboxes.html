@@ -589,13 +589,15 @@ Rechercher un fichier
 	  {% for date, infos in data.items %}
 	    <button class="btn btn-primary" type="button" data-toggle="collapse"
 	            data-target="#{{ date }}" aria-expanded="false"
-		aria-controls="{{ date }}"> {{ date }}</button><br><br>
+		    aria-controls="{{ date }}"> {{ date }}
+	    </button><br><br>
 	    <div class="collapse" id="{{ date }}">
 	      <div class="well">
-	        {% for server, status in infos.items %}
-                  <h5>{{ server }}</h5>
-                  <p>{{ status.delete }}, {{ status.insert }}</p>
-                {% endfor %}
+		<ul>
+	          {% for server, status in infos.items %}
+                    <li>{{ server }}</li>
+                  {% endfor %}
+                </ul>
 	      </div>
 	    </div>
           {% endfor %}
