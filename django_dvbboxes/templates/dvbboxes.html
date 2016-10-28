@@ -589,21 +589,20 @@ Rechercher un fichier
           <button class="btn btn-primary" type="button" data-toggle="collapse"
 	          data-target="#{{ day }}" aria-expanded="false"
 		  aria-controls="{{ day }}"> {{ day }}</button><br><br>
-	    <div class="collapse" id="{{ day }}">
-	      <div class="well">
-                {% for server, status in data.items %}
-                  <h5>{{ server }}</h5>
-                  {% if not status.delete or not status.insert %}
-                    <p>L'application du listing <b>ne s'est pas bien passée</b>.
-                       Le contenu de la base de données sur ce serveur n'a pas été
-                       correctement mis à jour</p>
-                  {% else }
-                    <p>OK</p>
-                  {% endif %}<br><br>
-                {% endfor %}
-	      </div>
+	  <div class="collapse" id="{{ day }}">
+	    <div class="well">
+              {% for server, status in data.items %}
+                <h5>{{ server }}</h5>
+                {% if not status.delete or not status.insert %}
+                  <p>L'application du listing <b>ne s'est pas bien passée</b>.
+                     Le contenu de la base de données sur ce serveur n'a pas été
+                     correctement mis à jour</p>
+                {% else }
+                  <p>OK</p>
+                {% endif %}<br><br>
+              {% endfor %}
 	    </div>
-          {% endfor %}
+	  </div>
         {% endfor %}
       </div>
       <div class="modal-footer">
