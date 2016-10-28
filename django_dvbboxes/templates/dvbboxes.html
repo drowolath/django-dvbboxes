@@ -594,18 +594,12 @@ Rechercher un fichier
 	      <div class="well">
 	        {% for server, status in infos.items %}
                   <h5>{{ server }}</h5>
-		  {% if not status.delete or not status.insert %}
-                    <p>L'application du listing n'a pas correctement fonctionné.</p>
-		    <p>Il va falloir recommencer si vous tenez à ce noeud.</p>
-                  {% else %}
-                    <p>OK</p>
-                  {% endif %}
+                  <p>{{ status.delete }}, {{ status.insert }}</p>
                 {% endfor %}
 	      </div>
 	    </div>
           {% endfor %}
         {% endfor %}
-
       </div>
       <div class="modal-footer">
 	<button type="button" class="btn btn-default"
