@@ -587,10 +587,10 @@ Rechercher un fichier
       <div class="modal-body">
 	{% for town, data in result.items %}
 	  {% for date, infos in data.items %}
-	    <button class="btn btn-default" type="button" data-toggle="collapse"
+	    <button class="btn btn-primary" type="button" data-toggle="collapse"
 	            data-target="#{{ date }}" aria-expanded="false"
 		aria-controls="{{ date }}"> {{ date }}</button><br><br>
-	    <div class="collapse" id="{{ town }}">
+	    <div class="collapse" id="{{ date }}">
 	      <div class="well">
 	        {% for server, status in infos.items %}
                   <h5>{{ server }}</h5>
