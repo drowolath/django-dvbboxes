@@ -26,6 +26,10 @@ class RenameMediaForm(forms.Form):
     name = forms.CharField(max_length=100, required=True)
 
 
+class UploadMediaCheckForm(forms.Form):
+    filename = forms.FileField(required=True)
+
+
 class UploadListingForm(forms.Form):
     """uploading a listing"""
     filename = forms.FileField(required=True)

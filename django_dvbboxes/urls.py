@@ -5,6 +5,7 @@ app_name = 'django_dvbboxes'
 
 urlpatterns = [
     # views.media urls
+    url(r'media/check/$', views.media, name='media_check'),
     url(r'media/search/$', views.media, name='media_search'),
     url(r'media/delete/(?P<filename>\w+)/$',
         views.media,

@@ -41,12 +41,6 @@ Rechercher un fichier
 <div class="row">
   <div class="col-lg-12 text-center v-center" style="font-size:39pt;">
     <a href="">
-      <i class="fa fa-database"
-	 data-toggle="modal"
-	 data-target="#sysModal"
-	 title="Disques, copies, etc."></i>
-    </a>
-    <a href="">
       <i class="fa fa-tv"
 	 data-toggle="modal"
 	 data-target="#epgModal"
@@ -57,6 +51,16 @@ Rechercher un fichier
 	 data-toggle="modal"
 	 data-target="#listingModal"
 	 title="Charger un listing"></i>
+    </a>
+    <a href="">
+      <i class="fa fa-film"
+	 data-toggle="modal"
+	 data-target="#mediaModal"
+	 title="Vérifier une liste de media"></i>
+    </a>
+    <a href="/admin">
+      <i class="fa fa-cogs"
+	 title="Administration"></i>
     </a>
     <a href="{% url 'logout' %}">
       <i class="fa fa-power-off"
@@ -91,37 +95,6 @@ Rechercher un fichier
 	    <li>les noms de fichier doivent être fournis avec une extension en .ts, quand il s'agit de toute autre opération qu'une recherche</li>
 	  </ul>
 	</p>
-      </div>
-      <div class="modal-footer">
-	<button type="button" class="btn btn-default"
-		data-dismiss="modal">Retour</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade" id="sysModal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-	<button type="button" class="close"
-		data-dismiss="modal" aria-label="Close">
-	  <span aria-hidden="true">&times;</span>
-	</button>
-	<h4 class="modal-title" id="myModalLabel">Etat des noeuds du cluster</h4>
-      </div>
-      <div class="modal-body">
-	{% for town, servers in cluster.items %}
-	  <button class="btn btn-default" type="button" data-toggle="collapse"
-	        data-target="#{{ town }}" aria-expanded="false"
-		aria-controls="{{ town }}">
-	    {{ town|capfirst }}
-	  </button><br><br>
-	  <div class="collapse" id="{{ town }}">
-	    <div class="well">
-	    </div>
-	  </div>
-        {% endfor %}
       </div>
       <div class="modal-footer">
 	<button type="button" class="btn btn-default"
@@ -229,6 +202,38 @@ Rechercher un fichier
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="mediaModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+	<button type="button" class="close"
+		data-dismiss="modal" aria-label="Close">
+	  <span aria-hidden="true">&times;</span>
+	</button>
+	<h4 class="modal-title" id="myModalLabel">Chargez une liste de media</h4>
+      </div>
+      <div class="modal-body">
+	<form class="col-lg-12"
+	      role="form"
+	      method="POST"
+	      action="{% url 'django_dvbboxes:media_check' %}"
+	      enctype="multipart/form-data">{% csrf_token %}
+	  <div class="input-group" style="width:340px;margin:0 auto;">
+	    <input name="filename" type="file">
+	    <span class="input-group-btn">
+	      <button class="btn btn-small btn-primary" type="submit">Go!</button>
+	    </span>
+	  </div>
+	</form>
+      </div>
+      <div class="modal-footer">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">Retour</button>
+      </div>
+    </div>
+  </div>
+</div>
 {% if not user.username %}
 <div class="modal fade" role="dialog"
      aria-labelledby="loginLabel"
@@ -290,6 +295,45 @@ Rechercher un fichier
 	  </ul>
         {% else %}
           Aucun résultat n'a été trouvé.
+        {% endif %}
+      </div>
+      <div class="modal-footer">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">Retour</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% elif action == "media_check" %}
+<div class="modal fade" id="resultModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+	<button type="button" class="close"
+		data-dismiss="modal" aria-label="Close">
+	  <span aria-hidden="true">&times;</span>
+	</button>
+	<h4 class="modal-title" id="myModalLabel">R&eacute;sultats</h4>
+      </div>
+      <div class="modal-body" id="tsfiles">
+	{% if result %}
+	  <input class="search" placeholder="Filtrer" />
+	  <ul class="list">
+	    {% for filename, towns in result.items %}
+ 	      <li>
+	        {% if towns %}
+                  <a class="moviename"
+                     href="{% url 'django_dvbboxes:media_infos' filename=filename %}">
+		  {{ filename }}
+                  </a> ({{ towns|join:", " }})
+                {% else %}
+                  {{ filename }} n'existe pas
+                {% endif %}
+              </li>
+	    {% endfor %}
+	  </ul>
+        {% else %}
+          Aucun résultat n'a pu être retourné.
         {% endif %}
       </div>
       <div class="modal-footer">
@@ -412,17 +456,21 @@ Rechercher un fichier
 	  <span aria-hidden="true">&times;</span>
 	</button>
 	<h4 class="modal-title" id="myModalLabel">Programme du {{ date }} sur {{ channel }}</h4>
-	<a href="/static/xml/{{ xmlfile }}.xml">
-	  Télécharger le fichier XMLTV
-	</a>
+	{% if result %}
+	  <a href="/static/xml/{{ xmlfile }}.xml">Télécharger le fichier XMLTV</a>
+        {% endif %}
       </div>
       <div class="modal-body">
-        {% for index, data in result.items %}
-          {% if not data.4 %}<b>{% endif %}
-	  {{ data.0 }} - {{ data.1 }}: {{ data.2 }} {% if data.3 %}({{ data.3 }}){% endif %}
-          {% if not data.4 %}</b>{% endif %}
-          <br>
-        {% endfor %}
+	{% if result %}
+          {% for index, data in result.items %}
+            {% if not data.4 %}<b>{% endif %}
+	    {{ data.0 }} - {{ data.1 }}: {{ data.2 }} {% if data.3 %}({{ data.3 }}){% endif %}
+            {% if not data.4 %}</b>{% endif %}
+            <br>
+          {% endfor %}
+        {% else %}
+          Il n'y a pas de programme pour cette date
+        {% endif %}
       </div>
       <div class="modal-footer">
 	<button type="button" class="btn btn-default"
@@ -604,6 +652,11 @@ $(function () {
     window.location.href = "{% url 'django_dvbboxes:index' %}";
   });
   {% if action == "media_search" %}
+  var options = {
+    valueNames: ['moviename']
+  };
+  var tsfilesList = new List('tsfiles', options);
+  {% elif action == "media_check" %}
   var options = {
     valueNames: ['moviename']
   };

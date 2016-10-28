@@ -69,83 +69,86 @@ def createtitle(name):
 def buildxml(parsed_data, service_id):
     """create xml files for epg"""
     for data in parsed_data:
-        day = data['day']
-        del data['day']
-        keys = sorted(data, key=lambda x: int(x.split('_')[1]))
-        xml = {
-            'BroadcastData': {
-                'ProviderInfo': {
-                    'ProviderId': '',
-                    'ProviderName': '',
-                    },
-                'ScheduleData': {
-                    'ChannelPeriod': {
-                        'ChannelId': service_id,
-                        'Event': [],
+        if data and len(data)>1:
+            day = data['day']
+            keys = [i for i in data if i!='day']
+            keys = sorted(keys, key=lambda x: int(x.split('_')[1]))
+            xml = {
+                'BroadcastData': {
+                    'ProviderInfo': {
+                        'ProviderId': '',
+                        'ProviderName': '',
+                        },
+                    'ScheduleData': {
+                        'ChannelPeriod': {
+                            'ChannelId': service_id,
+                            'Event': [],
+                            },
                         },
                     },
-                },
-            }
-        channelperiod = xml['BroadcastData']['ScheduleData']
-        channelperiod = channelperiod['ChannelPeriod']
-        for key in keys:
-            timestamp, index = key.split('_')
-            info = data[key]
-            filename = info['filename']
-            if not filename.endswith('.ts'):
-                filename += '.ts'
-            if not filename.startswith('ba_'):
-                media = models.Media.objects.filter(
-                    filename__startswith=filename)
-                if media:
-                    media = media.first()
-                    name = media.name
-                    desc = media.desc
-                else:
-                    desc = ''
-                    name = createtitle(filename)
-                if '@beginTime' not in channelperiod:
-                    channelperiod['@beginTime'] = build_tmira_datetime(
-                        datetime.fromtimestamp(
-                            float(timestamp)).strftime('%d-%m-%Y %H:%M:%S'))
-                event = {
-                    '@duration': str(info['duration']),
-                    '@beginTime': build_tmira_datetime(
-                        datetime.fromtimestamp(
-                            float(timestamp)).strftime('%d-%m-%Y %H:%M:%S')),
-                    'EventType': 'S',
-                    'FreeAccess': '1',
-                    'Unscrambled': '1',
-                    'EpgProduction': {
-                        'ParentalRating': {
-                            '@countryCode': "MDG",
-                            '#text': '0',
-                            },
-                        'DvbContent': {
-                            'Content': {
-                                '@nibble2': '0',
-                                '@nibble1': '0',
+                }
+            channelperiod = xml['BroadcastData']['ScheduleData']
+            channelperiod = channelperiod['ChannelPeriod']
+            for key in keys:
+                timestamp, index = key.split('_')
+                info = data[key]
+                filename = info['filename']
+                if not filename.endswith('.ts'):
+                    filename += '.ts'
+                if not filename.startswith('ba_'):
+                    media = models.Media.objects.filter(
+                        filename__startswith=filename)
+                    if media:
+                        media = media.first()
+                        name = media.name
+                        desc = media.desc
+                    else:
+                        desc = ''
+                        name = createtitle(filename)
+                    if '@beginTime' not in channelperiod:
+                        channelperiod['@beginTime'] = build_tmira_datetime(
+                            datetime.fromtimestamp(
+                                float(timestamp)).strftime(
+                                    '%d-%m-%Y %H:%M:%S'))
+                    event = {
+                        '@duration': str(info['duration']),
+                        '@beginTime': build_tmira_datetime(
+                            datetime.fromtimestamp(
+                                float(timestamp)).strftime(
+                                    '%d-%m-%Y %H:%M:%S')),
+                        'EventType': 'S',
+                        'FreeAccess': '1',
+                        'Unscrambled': '1',
+                        'EpgProduction': {
+                            'ParentalRating': {
+                                '@countryCode': "MDG",
+                                '#text': '0',
+                                },
+                            'DvbContent': {
+                                'Content': {
+                                    '@nibble2': '0',
+                                    '@nibble1': '0',
+                                    },
+                                },
+                            'EpgText': {
+                                '@language': 'fre',
+                                'ShortDescription': '',
+                                'Description': desc,
+                                'Name': name,
                                 },
                             },
-                        'EpgText': {
-                            '@language': 'fre',
-                            'ShortDescription': '',
-                            'Description': desc,
-                            'Name': name,
-                            },
-                        },
-                    }
-                channelperiod['Event'].append(event)
-        else:
-            channelperiod['@endTime'] = build_tmira_datetime(
-                datetime.fromtimestamp(
-                    float(timestamp)).strftime('%d-%m-%Y %H:%M:%S'))
-        xmlfile = os.path.join(
-            settings.XMLTV,
-            '{0}_{1}'.format(service_id, day)
-            )
-        with open(xmlfile+'.xml', 'w') as f:
-            f.write(xmltodict.unparse(xml))
+                        }
+                    channelperiod['Event'].append(event)
+            else:
+                channelperiod['@endTime'] = build_tmira_datetime(
+                    datetime.fromtimestamp(
+                        float(timestamp)).strftime('%d-%m-%Y %H:%M:%S'))
+            xmlfile = os.path.join(
+                settings.XMLTV,
+                '{0}_{1}'.format(service_id, day)
+                )
+            with open(xmlfile+'.xml', 'w') as f:
+                f.write(xmltodict.unparse(xml))
     cmd = "python /usr/local/share/dvb/nemo/manage.py collectstatic --noinput"
     subprocess.call(shlex.split(cmd))
 
@@ -174,6 +177,7 @@ def media(request, **kwargs):
         'actions': [
             'media_search',
             'media_display',
+            'media_check'
             ],
         }
     if 'media/delete' in request.path:
@@ -209,6 +213,24 @@ def media(request, **kwargs):
                         subprocess.call(shlex.split(cmd))
                 return redirect('django_dvbboxes:media_infos',
                                 filename=new_name.rstrip('.ts'))
+            else:
+                context['errors'] = form.errors
+                return render(request, 'dvbboxes.html', context)
+    elif 'media/check' in request.path:
+        if request.method == 'GET':
+            return redirect('django_dvbboxes:index')
+        elif request.method == 'POST':
+            form = forms.UploadMediaCheckForm(request.POST, request.FILES)
+            if form.is_valid():
+                context['action'] = 'media_check'
+                filepath = handle_uploaded_file(request.FILES['filename'])
+                result = {}
+                with open(filepath) as infile:
+                    for line in infile:
+                        line = line.replace('\n', '')
+                        result[line] = dvbboxes.Media(line).towns
+                context['result'] = result
+                return render(request, 'dvbboxes.html', context)
             else:
                 context['errors'] = form.errors
                 return render(request, 'dvbboxes.html', context)
@@ -358,8 +380,8 @@ def listing(request, **kwargs):
                     data = json.loads(data)
                     json_result.append(data)
                     day = data['day']
-                    del data['day']
-                    starts = sorted(data, key=lambda x: float(x.split('_')[1]))
+                    starts = [i for i in data if i != 'day']
+                    starts = sorted(starts, key=lambda x: float(x.split('_')[1]))
                     absent_files = 0
                     for start in starts:
                         t, i = start.split('_')
