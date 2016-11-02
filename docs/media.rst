@@ -11,6 +11,8 @@ via les ressources suivantes
 
 * :ref:`django_dvbboxes_media_infos`
 
+* :ref:`django_dvbboxes_media_check`
+
 * :ref:`django_dvbboxes_media_rename`
 
 * :ref:`django_dvbboxes_media_delete`
@@ -21,7 +23,7 @@ via les ressources suivantes
 Rechercher un fichier media: :file:`/media/search`
 ==================================================
 
-:code:`django-dvbboxes` propose un formulaire de recherche de fichiers à travers le cluster.
+La ressource propose un formulaire de recherche de fichiers à travers le cluster.
 L'application utilise la propriété de recherche fournie par le module :code:`dvbboxes`.
 
 Pour résultat, elle fait la liste de tous les fichiers correspondant à la recherche, donnant aussi
@@ -56,6 +58,15 @@ Elle donne accès à un formulaire qui permet de donner un titre et un descripti
 
    Les paires (titre, nom de fichier) sont uniques du point de vue de l'application.
 
+.. _django_dvbboxes_media_check:
+
+Vérifier l'existence d'un ou plusieurs fichiers: :file:`/media/check`
+=====================================================================
+
+La ressource propose un formulaire permettant d'uploader un fichier contenant une liste
+de nom de fichiers media à vérifier.
+
+Le résultat est une liste donnant sur chaque ligne, un fichier suivi des groupes de cluster dans lesquels il est présent.
 
 .. _django_dvbboxes_media_rename:
 
@@ -72,8 +83,8 @@ Le fichier est renommé partout où il existe dans le cluster.
 
 .. _django_dvbboxes_media_delete:
 
-Renommer un fichier media: :file:`/media/delete/<filename>`
-===========================================================
+Supprimer un fichier media: :file:`/media/delete/<filename>`
+============================================================
 
 Cette ressource permet comme son nom l'indique de supprimer un fichier.
 
