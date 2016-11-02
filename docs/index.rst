@@ -53,7 +53,7 @@ Une fois installé, vous pouvez configurer votre projet Django qui va utiliser c
 .. _django_dvbboxes_toc:
 
 Documentation
--------------
+=============
 
 .. toctree::
    :maxdepth: 4
