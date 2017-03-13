@@ -8,7 +8,6 @@ import shlex
 import string
 import subprocess
 import time
-import xmltodict
 from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -24,20 +23,11 @@ for i in sorted(dvbboxes.CHANNELS):
 
 
 def handle_uploaded_file(f):
-    path = os.path.join('/usr/local/share/dvb/nemo/uploads/', f.name)
+    path = os.path.join('/tmp/yourpath/', f.name)
     with open(path, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
     return path
-
-
-def build_tmira_datetime(dt):
-    u"""le format d'entrée est %d-%m-%Y %H:%M:%S"""
-    date, hour = dt.split()
-    day, month, year = date.split('-')
-    result = '{year}-{month}-{day}T{hour}+03:00'.format(
-        hour=hour, year=year, month=month, day=day)
-    return result
 
 
 def createtitle(name):
@@ -57,101 +47,7 @@ def createtitle(name):
     bar = [i for i in name.split("'")[:-1] if len(i) > 1]
     for j in bar:
         name = name.replace(j+"'", j+" ")
-    if name.startswith('Ba '):
-        name = name.replace('Ba ', 'Bande Annonce ')
-    else:
-        name = name.replace(' Ctv4', '')
-        name = name.replace(' Ctv3', '')
-        name = name.replace(' Ctv2', '')
-        name = name.replace(' Ctv', '')
     return name
-
-
-def buildxml(parsed_data, service_id):
-    """create xml files for epg"""
-    for data in parsed_data:
-        if data and len(data) > 1:
-            day = data['day']
-            keys = [i for i in data if i != 'day']
-            keys = sorted(keys, key=lambda x: int(x.split('_')[1]))
-            xml = {
-                'BroadcastData': {
-                    'ProviderInfo': {
-                        'ProviderId': '',
-                        'ProviderName': '',
-                        },
-                    'ScheduleData': {
-                        'ChannelPeriod': {
-                            'ChannelId': service_id,
-                            'Event': [],
-                            },
-                        },
-                    },
-                }
-            channelperiod = xml['BroadcastData']['ScheduleData']
-            channelperiod = channelperiod['ChannelPeriod']
-            for key in keys:
-                timestamp, index = key.split('_')
-                info = data[key]
-                filename = info['filename']
-                if not filename.endswith('.ts'):
-                    filename += '.ts'
-                if not filename.startswith('ba_'):
-                    media = models.Media.objects.filter(
-                        filename__startswith=filename)
-                    if media:
-                        media = media.first()
-                        name = media.name
-                        desc = media.desc
-                    else:
-                        desc = ''
-                        name = createtitle(filename)
-                    if '@beginTime' not in channelperiod:
-                        channelperiod['@beginTime'] = build_tmira_datetime(
-                            datetime.fromtimestamp(
-                                float(timestamp)).strftime(
-                                    '%d-%m-%Y %H:%M:%S'))
-                    event = {
-                        '@duration': str(info['duration']),
-                        '@beginTime': build_tmira_datetime(
-                            datetime.fromtimestamp(
-                                float(timestamp)).strftime(
-                                    '%d-%m-%Y %H:%M:%S')),
-                        'EventType': 'S',
-                        'FreeAccess': '1',
-                        'Unscrambled': '1',
-                        'EpgProduction': {
-                            'ParentalRating': {
-                                '@countryCode': "MDG",
-                                '#text': '0',
-                                },
-                            'DvbContent': {
-                                'Content': {
-                                    '@nibble2': '0',
-                                    '@nibble1': '0',
-                                    },
-                                },
-                            'EpgText': {
-                                '@language': 'fre',
-                                'ShortDescription': '',
-                                'Description': desc,
-                                'Name': name,
-                                },
-                            },
-                        }
-                    channelperiod['Event'].append(event)
-            else:
-                channelperiod['@endTime'] = build_tmira_datetime(
-                    datetime.fromtimestamp(
-                        float(timestamp)).strftime('%d-%m-%Y %H:%M:%S'))
-            xmlfile = os.path.join(
-                settings.XMLTV,
-                '{0}_{1}'.format(service_id, day)
-                )
-            with open(xmlfile+'.xml', 'w') as f:
-                f.write(xmltodict.unparse(xml))
-    cmd = "python /usr/local/share/dvb/nemo/manage.py collectstatic --noinput"
-    subprocess.call(shlex.split(cmd))
 
 
 @login_required
@@ -278,7 +174,7 @@ def media(request, **kwargs):
         duration = media.duration
         if not duration:
             # file does not exist in the cluster
-            context['errors'] = "Ce fichier n'existe nulle part"
+            context['errors'] = "This file does not exist"
             return render(request, 'dvbboxes.html', context)
         try:
             mediaobject = models.Media.objects.get(filename=filename)
@@ -368,8 +264,6 @@ def listing(request, **kwargs):
                 response = dvbboxes.Listing.apply(
                     parsed_data, service_id, towns
                     )
-                # create xml files
-                buildxml(parsed_data, service_id)
                 # reorganize response by days
                 result = collections.OrderedDict()
                 for day in days:
@@ -396,8 +290,8 @@ def listing(request, **kwargs):
                     key=lambda x: datetime.strptime(x, '%d%m%Y')
                     )  # sort days in the listing
                 if len(days) > 31:
-                    context['errors'] = ("Impossible de traiter "
-                                         "plus de 31 jours")
+                    context['errors'] = ("Cannot process "
+                                         "more than 31 days")
                     return render(request, 'dvbboxes.html', context)
                 context['action'] = 'listing_parse'
                 missing_files = [
@@ -501,12 +395,8 @@ def program(request, **kwargs):
                     ', '.join(missing_towns),
                     duration
                     ]
-            xmlfile = '{0}_{1}'.format(service_id, date)
-            if xmlfile+'.xml' not in os.listdir(settings.XMLTV):
-                buildxml([parsed_data], service_id)
             context['result'] = result
             context['date'] = date
-            context['xmlfile'] = xmlfile
             context['channel'] = CHANNELS[int(service_id)]
             return render(request, 'dvbboxes.html', context)
         else:

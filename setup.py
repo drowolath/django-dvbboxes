@@ -15,7 +15,6 @@ setup(
     license='Apache 2.0',
     description='A simple Django app interfacing dvbboxes',
     long_description=README,
-    url='http:/gitlab.blueline.mg/default/django-dvbboxes.git',
     author='Thomas Ayih-Akakpo',
     author_email='thomas.ayih-akakpo@gulfsat.mg',
     classifiers=[

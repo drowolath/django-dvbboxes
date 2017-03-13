@@ -28,7 +28,7 @@ Rechercher un fichier
       </ul>
     </span>
     <input type="text" class="form-control" name="expression"
-	   placeholder="Rechercher un fichier...">
+	   placeholder="Search a movie...">
     <span class="input-group-btn"> 
       <button class="btn btn-small btn-primary" type="submit">Go!</button>
     </span>
@@ -44,19 +44,19 @@ Rechercher un fichier
       <i class="fa fa-tv"
 	 data-toggle="modal"
 	 data-target="#programModal"
-	 title="Guide des programmes"></i>
+	 title="Programs guide"></i>
     </a>
     <a href="">
       <i class="fa fa-file-text"
 	 data-toggle="modal"
 	 data-target="#listingModal"
-	 title="Charger un listing"></i>
+	 title="Load a listing"></i>
     </a>
     <a href="">
       <i class="fa fa-film"
 	 data-toggle="modal"
 	 data-target="#mediaModal"
-	 title="Vérifier une liste de media"></i>
+	 title="Check a list of media files"></i>
     </a>
     <a href="/admin">
       <i class="fa fa-cogs"
@@ -64,7 +64,7 @@ Rechercher un fichier
     </a>
     <a href="{% url 'logout' %}">
       <i class="fa fa-power-off"
-	 title="Déconnection"></i>
+	 title="Log out"></i>
     </a>
   </div>
 </div>
@@ -79,27 +79,16 @@ Rechercher un fichier
 		data-dismiss="modal" aria-label="Close">
 	  <span aria-hidden="true">&times;</span>
 	</button>
-	<h4 class="modal-title" id="myModalLabel">Erreur(s)</h4>
+	<h4 class="modal-title" id="myModalLabel">Error(s)</h4>
 	<p>{{ errors }}</p>
       </div>
       <div class="modal-body">
-	<p>Une ou plusieurs erreurs sont survenues lors du traitement des données
-	  fournies (via formulaire ou URL). Vérifiez bien que vous avez saisi toutes les
-	  valeurs nécessaires, et ce correctement. L'être humain est peut-être cousin
-	  de certains primates, mais ça ne vous donne aucun droit.
-	</p>
-	<p> Ceci dit les erreurs les plus fréquentes violent les principes suivants:
-	  <ul>
-            <li>les fichiers qui n'existent nulle part donnent cette page d'erreur</li>
-	    <li>les dates doivent respecter le format <b>jjmmaaaa</b> (ex: 01102016)</li>
-	    <li>les fichiers de listing doivent être nommés <b>"chaine_jourdebut_jourfin"</b> (ex: 85_01102016_30102016)</li>
-	    <li>les noms de fichier doivent être fournis avec une extension en .ts, quand il s'agit de toute autre opération qu'une recherche</li>
-	  </ul>
-	</p>
+	<p>One or several errors occured during provided data's processing. Please, make sure
+	  you provided correct data</p>
       </div>
       <div class="modal-footer">
 	<button type="button" class="btn btn-default"
-		data-dismiss="modal">Retour</button>
+		data-dismiss="modal">Back</button>
       </div>
     </div>
   </div>
@@ -113,7 +102,7 @@ Rechercher un fichier
 		data-dismiss="modal" aria-label="Close">
 	  <span aria-hidden="true">&times;</span>
 	</button>
-	<h4 class="modal-title" id="myModalLabel">Guide des programmes</h4>
+	<h4 class="modal-title" id="myModalLabel">Programs guide</h4>
       </div>
       <div class="modal-body">
 	<form class="col-lg-12"
@@ -161,7 +150,7 @@ Rechercher un fichier
       </div>
       <div class="modal-footer">
 	<button type="button" class="btn btn-default"
-		data-dismiss="modal">Retour</button>
+		data-dismiss="modal">Back</button>
       </div>
     </div>
   </div>
@@ -187,7 +176,7 @@ Rechercher un fichier
 	    <label class="btn" for="filename">
 	      <input id="filename" type="file"
 		     style="display:none;" name="filename"
-		     onchange="$('#upload-file-info').html($(this).val());"> Parcourir...
+		     onchange="$('#upload-file-info').html($(this).val());"> Browse...
 	    </label>
 	    <span class='label label-info' id="upload-file-info"></span>
 	    <span class="input-group-btn">
@@ -198,7 +187,7 @@ Rechercher un fichier
       </div>
       <div class="modal-footer">
 	<button type="button" class="btn btn-default"
-		data-dismiss="modal">Retour</button>
+		data-dismiss="modal">Back</button>
       </div>
     </div>
   </div>
@@ -212,7 +201,7 @@ Rechercher un fichier
 		data-dismiss="modal" aria-label="Close">
 	  <span aria-hidden="true">&times;</span>
 	</button>
-	<h4 class="modal-title" id="myModalLabel">Chargez une liste de media</h4>
+	<h4 class="modal-title" id="myModalLabel">Upload a list</h4>
       </div>
       <div class="modal-body">
 	<form class="col-lg-12"
@@ -230,7 +219,7 @@ Rechercher un fichier
       </div>
       <div class="modal-footer">
 	<button type="button" class="btn btn-default"
-		data-dismiss="modal">Retour</button>
+		data-dismiss="modal">Back</button>
       </div>
     </div>
   </div>
@@ -247,7 +236,7 @@ Rechercher un fichier
 		aria-label="Close">
 	  <span aria-hidden="true">&times;</span>
 	</button>
-	<h4 class="modal-title" id="loginLabel">Veuillez vous identifier</h4>
+	<h4 class="modal-title" id="loginLabel">Please log in</h4>
       </div>
       <div class="modal-body">
 	<div class="container-fluid">
@@ -279,7 +268,7 @@ Rechercher un fichier
 		data-dismiss="modal" aria-label="Close">
 	  <span aria-hidden="true">&times;</span>
 	</button>
-	<h4 class="modal-title" id="myModalLabel">R&eacute;sultats</h4>
+	<h4 class="modal-title" id="myModalLabel">Results</h4>
       </div>
       <div class="modal-body" id="tsfiles">
 	{% if answer %}
@@ -295,12 +284,12 @@ Rechercher un fichier
 	    {% endfor %}
 	  </ul>
         {% else %}
-          Aucun résultat n'a été trouvé.
+          No result found
         {% endif %}
       </div>
       <div class="modal-footer">
 	<button type="button" class="btn btn-default"
-		data-dismiss="modal">Retour</button>
+		data-dismiss="modal">Back</button>
       </div>
     </div>
   </div>
@@ -314,7 +303,7 @@ Rechercher un fichier
 		data-dismiss="modal" aria-label="Close">
 	  <span aria-hidden="true">&times;</span>
 	</button>
-	<h4 class="modal-title" id="myModalLabel">R&eacute;sultats</h4>
+	<h4 class="modal-title" id="myModalLabel">Results</h4>
       </div>
       <div class="modal-body" id="tsfiles">
 	{% if result %}
@@ -328,18 +317,18 @@ Rechercher un fichier
 		  {{ filename }}
                   </a> ({{ towns|join:", " }})
                 {% else %}
-                  {{ filename }} n'existe pas
+                  {{ filename }} does not exist
                 {% endif %}
               </li>
 	    {% endfor %}
 	  </ul>
         {% else %}
-          Aucun résultat n'a pu être retourné.
+          No result found
         {% endif %}
       </div>
       <div class="modal-footer">
 	<button type="button" class="btn btn-default"
-		data-dismiss="modal">Retour</button>
+		data-dismiss="modal">Back</button>
       </div>
     </div>
   </div>
@@ -357,17 +346,17 @@ Rechercher un fichier
 	    id="myModalLabel">{{ filename }}</h4>
 	<br>
 	{% if not town %}
-	Villes: {{ answer.towns|join:", " }}
+	Towns: {{ answer.towns|join:", " }}
 	{% else %}
-	Ville: {{ town }}
+	Town: {{ town }}
 	{% endif %}
 	<br>
-	Durée: {{ answer.duration }}<br><br>
+	Duration: {{ answer.duration }}<br><br>
 	{% if answer.schedule %}
 	  <button class="btn btn-primary" type="button" data-toggle="collapse"
 		  data-target="#schedule" aria-expanded="false"
 		  aria-controls="schedule">
-	    Jours et heures de diffusion
+	    Days and hours of broadcast
 	  </button><br><br>
 	  <div class="collapse" id="schedule">
 	    <div class="well">
@@ -388,7 +377,7 @@ Rechercher un fichier
 	<button class="btn btn-default" type="button" data-toggle="collapse"
 	        data-target="#rename" aria-expanded="false"
 		aria-controls="rename">
-	    Renommer
+	    Rename
 	</button><br><br>
 	<div class="collapse" id="rename">
 	  <div class="well">
@@ -418,7 +407,7 @@ Rechercher un fichier
 	        action="{% url 'django_dvbboxes:media_delete' filename=filename %}"
                 >{% csrf_token %}
 	      <div class="input-group" style="width:340px;margin:0 auto;">
-	        <button class="btn btn-lg btn-danger" type="submit">Supprimer</button>
+	        <button class="btn btn-lg btn-danger" type="submit">Delete</button>
 	      </div>
 	    </form>
 	  </div>
@@ -428,7 +417,7 @@ Rechercher un fichier
         <form method="POST"
               action="{% url 'django_dvbboxes:media_infos' filename=filename%}">{% csrf_token %}
 	  <div class="form-group">
-	    <label for="name">Titre:</label>
+	    <label for="name">Title:</label>
 	    <input class="form-control" name="name" value="{{ db.name }}"/>
 	  </div>
 	  <div class="form-group">
@@ -436,13 +425,13 @@ Rechercher un fichier
 	    <textarea class="form-control" rows="6" name="desc">{{ db.desc }}</textarea>
 	  </div>
 	  <div class="form-group">
-	    <button class="btn btn-primary" type="submit">Sauvegarder</button>
+	    <button class="btn btn-primary" type="submit">Save</button>
 	  </div>
 	</form>
       </div>
       <div class="modal-footer">
 	<button type="button"
-		class="btn btn-default" data-dismiss="modal">Retour</button>
+		class="btn btn-default" data-dismiss="modal">Back</button>
       </div>
     </div>
   </div>
@@ -456,10 +445,7 @@ Rechercher un fichier
 		data-dismiss="modal" aria-label="Close">
 	  <span aria-hidden="true">&times;</span>
 	</button>
-	<h4 class="modal-title" id="myModalLabel">Programme du {{ date }} sur {{ channel }}</h4>
-	{% if result %}
-	  <a href="/static/xml/{{ xmlfile }}.xml">Télécharger le fichier XMLTV</a>
-        {% endif %}
+	<h4 class="modal-title" id="myModalLabel">Program of {{ date }} on {{ channel }}</h4>
       </div>
       <div class="modal-body">
 	{% if result %}
@@ -470,12 +456,12 @@ Rechercher un fichier
             <br>
           {% endfor %}
         {% else %}
-          Il n'y a pas de programme pour cette date
+          No program for this day
         {% endif %}
       </div>
       <div class="modal-footer">
 	<button type="button" class="btn btn-default"
-		data-dismiss="modal">Retour</button>
+		data-dismiss="modal">Back</button>
       </div>
     </div>
   </div>
@@ -489,12 +475,12 @@ Rechercher un fichier
 		data-dismiss="modal" aria-label="Close">
 	  <span aria-hidden="true">&times;</span>
 	</button>
-        <h4 class="modal-title" id="myModalLabel">Résultat de l'analyse</h4>
+        <h4 class="modal-title" id="myModalLabel">Result</h4>
       </div>
       <div class="modal-body">
 	{% if missing_files %}
 	<p>
-	  Les fichiers suivants n'existent pas:<br>{{ missing_files|join:"<br>" }}
+	  Following files do not exist:<br>{{ missing_files|join:"<br>" }}
 	</p><br><br>
 	{% endif %}
 	{% for day, data in result.items %}
@@ -519,7 +505,7 @@ Rechercher un fichier
 		{% if infos.2 %}</b>{% endif %}
 	        <br>
 	      {% endfor %}
-              <p>Fin des programmes: {{ data.2 }}</p>
+              <p>End of programs: {{ data.2 }}</p>
 	    </div>
 	  </div>
 	{% endfor %}
@@ -562,14 +548,14 @@ Rechercher un fichier
 	           </li>
 	         </ul>
 	       </span>
-	      <button class="btn btn-small btn-primary" type="submit">Appliquer</button>
+	      <button class="btn btn-small btn-primary" type="submit">Apply</button>
 	    </span>
 	  </div>
 	</form>
       </div>
       <div class="modal-footer">
 	<button type="button" class="btn btn-default"
-		data-dismiss="modal">Retour</button>
+		data-dismiss="modal">Back</button>
       </div>
     </div>
   </div>
@@ -583,7 +569,7 @@ Rechercher un fichier
 		data-dismiss="modal" aria-label="Close">
 	  <span aria-hidden="true">&times;</span>
 	</button>
-        <h4 class="modal-title" id="myModalLabel">Résultat de l'application de votre listing</h4>
+        <h4 class="modal-title" id="myModalLabel">Results</h4>
       </div>
       <div class="modal-body">
 	{% for day, data in result.items %}
@@ -595,9 +581,7 @@ Rechercher un fichier
               {% for server, status in data.items %}
                 <h5>{{ server }}</h5>
                 {% if not status %}
-                  <p>L'application du listing <b>ne s'est pas bien passée</b>.
-                     Le contenu de la base de données sur ce serveur n'a pas été
-                     correctement mis à jour</p>
+		  <p>Something went wrong: database on this server was not correctly updated</p>
                 {% else %}
                   <p>OK</p>
                 {% endif %}<br><br>
@@ -608,7 +592,7 @@ Rechercher un fichier
       </div>
       <div class="modal-footer">
 	<button type="button" class="btn btn-default"
-		data-dismiss="modal">Retour</button>
+		data-dismiss="modal">Back</button>
       </div>
     </div>
   </div>
