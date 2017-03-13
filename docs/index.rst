@@ -24,7 +24,7 @@ Pour installer, on partira du principe que vous avez installé :code:`pip` sur v
 
 .. code-block:: bash
 
-   $ git clone http://gitlab.blueline.mg/default/django-dvbboxes.git -b master
+   $ git clone http://github.com/drowolath/django-dvbboxes.git -b master
    $ cd django-dvbboxes
    $ python setup.py sdist
    $ pip install dist/django-dvbboxes-x.y.tar.gz
